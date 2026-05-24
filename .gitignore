@@ -1,0 +1,4 @@
+.vscode/
+.marscode/
+.env
+.env/*
