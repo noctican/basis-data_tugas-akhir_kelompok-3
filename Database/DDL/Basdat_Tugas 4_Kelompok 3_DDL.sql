@@ -97,6 +97,7 @@ CREATE TABLE pelanggan (
 	jenis_member VARCHAR(50) DEFAULT('BLUE'),
 	tanggal_bergabung DATE DEFAULT(GETDATE()),
 	poin INT DEFAULT(0),
+	wallet DECIMAL(36, 2) DEFAULT(0),
 	is_used_voucher_percentage BIT DEFAULT(0),
 	is_used_voucher_price BIT DEFAULT(0),
 	CONSTRAINT fk_pengguna_pelanggan FOREIGN KEY (id_pengguna) REFERENCES pengguna(id_pengguna),
