@@ -9,77 +9,22 @@ public class VarianProduk {
     private String warna;
     private BigDecimal hargaVarian;
     private String ukuran;
-    private String namaProduk; // Helper
 
     public VarianProduk() {}
 
-    public VarianProduk(int idProduk, String sku, int stock, String warna, BigDecimal hargaVarian, String ukuran) {
-        this.idProduk = idProduk;
-        this.sku = sku;
-        this.stock = stock;
-        this.warna = warna;
-        this.hargaVarian = hargaVarian;
-        this.ukuran = ukuran;
-    }
-
-    public int getIdProduk() {
-        return idProduk;
-    }
-
-    public void setIdProduk(int idProduk) {
-        this.idProduk = idProduk;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
-    public String getWarna() {
-        return warna;
-    }
-
-    public void setWarna(String warna) {
-        this.warna = warna;
-    }
-
-    public BigDecimal getHargaVarian() {
-        return hargaVarian;
-    }
-
-    public void setHargaVarian(BigDecimal hargaVarian) {
-        this.hargaVarian = hargaVarian;
-    }
-
-    public String getUkuran() {
-        return ukuran;
-    }
-
-    public void setUkuran(String ukuran) {
-        this.ukuran = ukuran;
-    }
-
-    public String getNamaProduk() {
-        return namaProduk;
-    }
-
-    public void setNamaProduk(String namaProduk) {
-        this.namaProduk = namaProduk;
-    }
+    public int getIdProduk() { return idProduk; }
+    public void setIdProduk(int id) { this.idProduk = id; }
+    public String getSku() { return sku; }
+    public void setSku(String s) { this.sku = s; }
+    public int getStock() { return stock; }
+    public void setStock(int s) { this.stock = s; }
+    public String getWarna() { return warna; }
+    public void setWarna(String w) { this.warna = w; }
+    public BigDecimal getHargaVarian() { return hargaVarian; }
+    public void setHargaVarian(BigDecimal h) { this.hargaVarian = h; }
+    public String getUkuran() { return ukuran; }
+    public void setUkuran(String u) { this.ukuran = u; }
 
     @Override
-    public String toString() {
-        return sku + " (" + warna + ", " + ukuran + ")";
-    }
+    public String toString() { return warna + " (" + ukuran + ") - SKU: " + sku; }
 }

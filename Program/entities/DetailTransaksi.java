@@ -10,52 +10,14 @@ public class DetailTransaksi {
     private int kuantitas;
 
     public DetailTransaksi() {}
-
-    public DetailTransaksi(int idProduk, String sku, int idTransaksi, BigDecimal hargaPembelian, int kuantitas) {
-        this.idProduk = idProduk;
-        this.sku = sku;
-        this.idTransaksi = idTransaksi;
-        this.hargaPembelian = hargaPembelian;
-        this.kuantitas = kuantitas;
-    }
-
-    public int getIdProduk() {
-        return idProduk;
-    }
-
-    public void setIdProduk(int idProduk) {
-        this.idProduk = idProduk;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public int getIdTransaksi() {
-        return idTransaksi;
-    }
-
-    public void setIdTransaksi(int idTransaksi) {
-        this.idTransaksi = idTransaksi;
-    }
-
-    public BigDecimal getHargaPembelian() {
-        return hargaPembelian;
-    }
-
-    public void setHargaPembelian(BigDecimal hargaPembelian) {
-        this.hargaPembelian = hargaPembelian;
-    }
-
-    public int getKuantitas() {
-        return kuantitas;
-    }
-
-    public void setKuantitas(int kuantitas) {
-        this.kuantitas = kuantitas;
-    }
+    public int getIdProduk() { return idProduk; }
+    public void setIdProduk(int id) { this.idProduk = id; }
+    public String getSku() { return sku; }
+    public void setSku(String s) { this.sku = s; }
+    public int getIdTransaksi() { return idTransaksi; }
+    public void setIdTransaksi(int id) { this.idTransaksi = id; }
+    public BigDecimal getHargaPembelian() { return hargaPembelian; }
+    public void setHargaPembelian(BigDecimal h) { this.hargaPembelian = h; }
+    public int getKuantitas() { return kuantitas; }
+    public void setKuantitas(int k) { this.kuantitas = k; }
 }

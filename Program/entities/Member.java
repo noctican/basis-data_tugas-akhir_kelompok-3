@@ -10,47 +10,15 @@ public class Member {
 
     public Member() {}
 
-    public Member(String jenis, int poin, BigDecimal voucherPrice, BigDecimal voucherPercentage) {
-        this.jenis = jenis;
-        this.poin = poin;
-        this.voucherPrice = voucherPrice;
-        this.voucherPercentage = voucherPercentage;
-    }
-
-    public String getJenis() {
-        return jenis;
-    }
-
-    public void setJenis(String jenis) {
-        this.jenis = jenis;
-    }
-
-    public int getPoin() {
-        return poin;
-    }
-
-    public void setPoin(int poin) {
-        this.poin = poin;
-    }
-
-    public BigDecimal getVoucherPrice() {
-        return voucherPrice;
-    }
-
-    public void setVoucherPrice(BigDecimal voucherPrice) {
-        this.voucherPrice = voucherPrice;
-    }
-
-    public BigDecimal getVoucherPercentage() {
-        return voucherPercentage;
-    }
-
-    public void setVoucherPercentage(BigDecimal voucherPercentage) {
-        this.voucherPercentage = voucherPercentage;
-    }
+    public String getJenis() { return jenis; }
+    public void setJenis(String j) { this.jenis = j; }
+    public int getPoin() { return poin; }
+    public void setPoin(int p) { this.poin = p; }
+    public BigDecimal getVoucherPrice() { return voucherPrice; }
+    public void setVoucherPrice(BigDecimal v) { this.voucherPrice = v; }
+    public BigDecimal getVoucherPercentage() { return voucherPercentage; }
+    public void setVoucherPercentage(BigDecimal v) { this.voucherPercentage = v; }
 
     @Override
-    public String toString() {
-        return jenis;
-    }
+    public String toString() { return jenis; }
 }

@@ -5,30 +5,13 @@ public class Kategori {
     private String namaKategori;
 
     public Kategori() {}
+    public Kategori(int id, String nama) { this.idKategori = id; this.namaKategori = nama; }
 
-    public Kategori(int idKategori, String namaKategori) {
-        this.idKategori = idKategori;
-        this.namaKategori = namaKategori;
-    }
-
-    public int getIdKategori() {
-        return idKategori;
-    }
-
-    public void setIdKategori(int idKategori) {
-        this.idKategori = idKategori;
-    }
-
-    public String getNamaKategori() {
-        return namaKategori;
-    }
-
-    public void setNamaKategori(String namaKategori) {
-        this.namaKategori = namaKategori;
-    }
+    public int getIdKategori() { return idKategori; }
+    public void setIdKategori(int id) { this.idKategori = id; }
+    public String getNamaKategori() { return namaKategori; }
+    public void setNamaKategori(String nama) { this.namaKategori = nama; }
 
     @Override
-    public String toString() {
-        return namaKategori;
-    }
+    public String toString() { return namaKategori; }
 }

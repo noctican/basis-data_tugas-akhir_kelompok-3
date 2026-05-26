@@ -1,53 +1,24 @@
 package entities;
 
 public class SubKategori {
-    private int idKategori;
     private int idSubKategori;
+    private int idKategori;
     private String namaSubKategori;
-    private String namaKategori; // Helper for display
 
     public SubKategori() {}
-
-    public SubKategori(int idKategori, int idSubKategori, String namaSubKategori) {
-        this.idKategori = idKategori;
-        this.idSubKategori = idSubKategori;
-        this.namaSubKategori = namaSubKategori;
+    public SubKategori(int idSub, int idKat, String nama) {
+        this.idSubKategori = idSub;
+        this.idKategori = idKat;
+        this.namaSubKategori = nama;
     }
 
-    public int getIdKategori() {
-        return idKategori;
-    }
-
-    public void setIdKategori(int idKategori) {
-        this.idKategori = idKategori;
-    }
-
-    public int getIdSubKategori() {
-        return idSubKategori;
-    }
-
-    public void setIdSubKategori(int idSubKategori) {
-        this.idSubKategori = idSubKategori;
-    }
-
-    public String getNamaSubKategori() {
-        return namaSubKategori;
-    }
-
-    public void setNamaSubKategori(String namaSubKategori) {
-        this.namaSubKategori = namaSubKategori;
-    }
-
-    public String getNamaKategori() {
-        return namaKategori;
-    }
-
-    public void setNamaKategori(String namaKategori) {
-        this.namaKategori = namaKategori;
-    }
+    public int getIdSubKategori() { return idSubKategori; }
+    public void setIdSubKategori(int id) { this.idSubKategori = id; }
+    public int getIdKategori() { return idKategori; }
+    public void setIdKategori(int id) { this.idKategori = id; }
+    public String getNamaSubKategori() { return namaSubKategori; }
+    public void setNamaSubKategori(String nama) { this.namaSubKategori = nama; }
 
     @Override
-    public String toString() {
-        return namaSubKategori;
-    }
+    public String toString() { return namaSubKategori; }
 }

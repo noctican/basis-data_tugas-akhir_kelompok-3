@@ -9,77 +9,19 @@ public class Pelanggan {
     private int poin;
     private boolean isUsedVoucherPercentage;
     private boolean isUsedVoucherPrice;
-    private String namaLengkap; // Helper
 
     public Pelanggan() {}
 
-    public Pelanggan(int idPengguna, String jenisMember, Date tanggalBergabung, int poin, boolean isUsedVoucherPercentage, boolean isUsedVoucherPrice) {
-        this.idPengguna = idPengguna;
-        this.jenisMember = jenisMember;
-        this.tanggalBergabung = tanggalBergabung;
-        this.poin = poin;
-        this.isUsedVoucherPercentage = isUsedVoucherPercentage;
-        this.isUsedVoucherPrice = isUsedVoucherPrice;
-    }
-
-    public int getIdPengguna() {
-        return idPengguna;
-    }
-
-    public void setIdPengguna(int idPengguna) {
-        this.idPengguna = idPengguna;
-    }
-
-    public String getJenisMember() {
-        return jenisMember;
-    }
-
-    public void setJenisMember(String jenisMember) {
-        this.jenisMember = jenisMember;
-    }
-
-    public Date getTanggalBergabung() {
-        return tanggalBergabung;
-    }
-
-    public void setTanggalBergabung(Date tanggalBergabung) {
-        this.tanggalBergabung = tanggalBergabung;
-    }
-
-    public int getPoin() {
-        return poin;
-    }
-
-    public void setPoin(int poin) {
-        this.poin = poin;
-    }
-
-    public boolean isUsedVoucherPercentage() {
-        return isUsedVoucherPercentage;
-    }
-
-    public void setUsedVoucherPercentage(boolean usedVoucherPercentage) {
-        isUsedVoucherPercentage = usedVoucherPercentage;
-    }
-
-    public boolean isUsedVoucherPrice() {
-        return isUsedVoucherPrice;
-    }
-
-    public void setUsedVoucherPrice(boolean usedVoucherPrice) {
-        isUsedVoucherPrice = usedVoucherPrice;
-    }
-
-    public String getNamaLengkap() {
-        return namaLengkap;
-    }
-
-    public void setNamaLengkap(String namaLengkap) {
-        this.namaLengkap = namaLengkap;
-    }
-
-    @Override
-    public String toString() {
-        return namaLengkap != null ? namaLengkap + " (" + jenisMember + ")" : String.valueOf(idPengguna);
-    }
+    public int getIdPengguna() { return idPengguna; }
+    public void setIdPengguna(int id) { this.idPengguna = id; }
+    public String getJenisMember() { return jenisMember; }
+    public void setJenisMember(String j) { this.jenisMember = j; }
+    public Date getTanggalBergabung() { return tanggalBergabung; }
+    public void setTanggalBergabung(Date d) { this.tanggalBergabung = d; }
+    public int getPoin() { return poin; }
+    public void setPoin(int p) { this.poin = p; }
+    public boolean isUsedVoucherPercentage() { return isUsedVoucherPercentage; }
+    public void setUsedVoucherPercentage(boolean u) { this.isUsedVoucherPercentage = u; }
+    public boolean isUsedVoucherPrice() { return isUsedVoucherPrice; }
+    public void setUsedVoucherPrice(boolean u) { this.isUsedVoucherPrice = u; }
 }
