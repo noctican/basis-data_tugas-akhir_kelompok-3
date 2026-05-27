@@ -11,6 +11,7 @@ public class Kategori {
     public void setIdKategori(int id) { this.idKategori = id; }
     public String getNamaKategori() { return namaKategori; }
     public void setNamaKategori(String nama) { this.namaKategori = nama; }
+    
 
     @Override
     public String toString() { return namaKategori; }

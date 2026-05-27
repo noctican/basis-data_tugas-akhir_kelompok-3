@@ -19,17 +19,29 @@ public class DashboardPanel extends JPanel {
         JPanel mainPanel = new JPanel(new GridLayout(2, 1, 20, 20));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Top Products
         JPanel pPanel = new JPanel(new BorderLayout());
         pPanel.setBorder(BorderFactory.createTitledBorder("Top 5 Best Selling Products"));
-        productModel = new DefaultTableModel(new String[]{"Product Name", "Qty Sold"}, 0);
+
+        productModel = new DefaultTableModel(new String[]{"Product Name", "Qty Sold"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
+
         productTable = new JTable(productModel);
         pPanel.add(new JScrollPane(productTable), BorderLayout.CENTER);
 
-        // Top Customers
         JPanel cPanel = new JPanel(new BorderLayout());
         cPanel.setBorder(BorderFactory.createTitledBorder("Top 5 Customers by Spending"));
-        customerModel = new DefaultTableModel(new String[]{"Customer Name", "Total Spent"}, 0);
+
+        customerModel = new DefaultTableModel(new String[]{"Customer Name", "Total Spent"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; 
+            }
+        };
+
         customerTable = new JTable(customerModel);
         cPanel.add(new JScrollPane(customerTable), BorderLayout.CENTER);
 
