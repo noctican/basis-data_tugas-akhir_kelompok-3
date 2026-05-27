@@ -14,7 +14,6 @@ public class ReturnModel {
             conn = DatabaseConfig.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Insert Retur
             int idRetur = -1;
             String sqlR = "INSERT INTO retur (id_transaksi, status) VALUES (?, 'PENDING')";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlR, Statement.RETURN_GENERATED_KEYS)) {
@@ -25,7 +24,6 @@ public class ReturnModel {
                 }
             }
 
-            // 2. Insert Detail_retur
             String sqlDR = "INSERT INTO detail_retur (id_transaksi, id_retur, id_produk, sku, kuantitas, alasan) VALUES (?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlDR)) {
                 pstmt.setInt(1, idTransaksi);

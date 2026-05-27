@@ -7,7 +7,6 @@ import java.util.List;
 
 public class ReportModel {
     
-    // a. 5 produk penjualan tertinggi
     public List<Object[]> getTop5SellingProducts() {
         List<Object[]> list = new ArrayList<>();
         String sql = "SELECT TOP 5 p.nama_produk, SUM(dt.kuantitas) as total_qty " +
@@ -25,7 +24,6 @@ public class ReportModel {
         return list;
     }
 
-    // b. 5 pelanggan dengan total pembelian tertinggi
     public List<Object[]> getTop5SpendingCustomers() {
         List<Object[]> list = new ArrayList<>();
         String sql = "SELECT TOP 5 pg.nama_depan + ' ' + ISNULL(pg.nama_belakang, '') as full_name, SUM(t.total_pembelian) as total_spend " +
@@ -44,7 +42,6 @@ public class ReportModel {
         return list;
     }
 
-    // c. 3 barang paling banyak dibeli berbarengan dengan produk tertentu
     public List<Object[]> getFrequentlyBoughtTogether(int idProduk) {
         List<Object[]> list = new ArrayList<>();
         String sql = "SELECT TOP 3 p.nama_produk, COUNT(*) as frequency " +

@@ -24,5 +24,4 @@ public class Pengiriman {
     public void setIdTransaksi(int id) { this.idTransaksi = id; }
     public String getStatusPengiriman() { return statusPengiriman; }
     public void setStatusPengiriman(String s) { this.statusPengiriman = s; }
-    // ... other getters omitted for brevity but needed in real impl
 }

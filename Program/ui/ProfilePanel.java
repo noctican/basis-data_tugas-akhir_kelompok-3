@@ -32,7 +32,10 @@ public class ProfilePanel extends JPanel {
     }
 
     private void setupAlamatTable() {
-        alamatModel = new DefaultTableModel(new String[]{"ID", "Penerima", "Jalan", "Kota", "Provinsi", "No Telp"}, 0);
+        alamatModel = new DefaultTableModel(new String[]{"ID", "Penerima", "Jalan", "Kota", "Provinsi", "No Telp"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         alamatTable = new JTable(alamatModel);
         add(new JScrollPane(alamatTable), BorderLayout.CENTER);
     }
@@ -62,8 +65,6 @@ public class ProfilePanel extends JPanel {
         int option = JOptionPane.showConfirmDialog(this, message, "Add Address", JOptionPane.OK_CANCEL_OPTION);
         
         if (option == JOptionPane.OK_OPTION) {
-            // Need to implement Alamat CRUD in UserModel if not there
-            // For now, simple insert here or update UserModel.
             GUIHelper.showInfo(this, "Feature to save address coming soon (Model update required)");
         }
     }

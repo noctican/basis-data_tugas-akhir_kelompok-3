@@ -39,7 +39,6 @@ public class AuthModel {
     }
 
     private UserSession.Role determineRole(int idPengguna) {
-        // Check if Karyawan
         String queryKaryawan = "SELECT 1 FROM karyawan WHERE id_pengguna = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(queryKaryawan)) {
@@ -51,7 +50,6 @@ public class AuthModel {
             e.printStackTrace();
         }
 
-        // Check if Pelanggan
         String queryPelanggan = "SELECT 1 FROM pelanggan WHERE id_pengguna = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(queryPelanggan)) {

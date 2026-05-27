@@ -28,7 +28,10 @@ public class CartPanel extends JPanel {
     }
 
     private void setupTable() {
-        cartModel = new DefaultTableModel(new String[]{"Product ID", "SKU", "Qty", "Subtotal"}, 0);
+        cartModel = new DefaultTableModel(new String[]{"Product ID", "SKU", "Qty", "Subtotal"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         cartTable = new JTable(cartModel);
         add(new JScrollPane(cartTable), BorderLayout.CENTER);
     }

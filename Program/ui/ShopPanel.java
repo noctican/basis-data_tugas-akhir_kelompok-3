@@ -42,7 +42,10 @@ public class ShopPanel extends JPanel {
     }
 
     private void setupTable() {
-        productModel = new DefaultTableModel(new String[]{"ID", "Name", "Price", "Description"}, 0);
+        productModel = new DefaultTableModel(new String[]{"ID", "Name", "Price", "Description"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         productTable = new JTable(productModel);
         add(new JScrollPane(productTable), BorderLayout.CENTER);
     }

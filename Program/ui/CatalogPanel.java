@@ -282,7 +282,7 @@ private void showCategoryManager() {
                 GUIHelper.showError(dialog, "Pilih sub-kategori di tabel yang ingin diedit!");
                 return;
             }
-            int idSub = (int) subModel.getValueAt(row, 0); // Ambil ID asli yang tersembunyi
+            int idSub = (int) subModel.getValueAt(row, 0);
             String currentName = (String) subModel.getValueAt(row, 1);
             Kategori selectedKat = (Kategori) katCombo.getSelectedItem();
 
@@ -318,7 +318,6 @@ private void showCategoryManager() {
                     "Konfirmasi Hapus", JOptionPane.YES_NO_OPTION);
             
             if (confirm == JOptionPane.YES_OPTION) {
-                // Perhatikan: PK dari SubKategori di DDL Anda adalah (id_kategori, id_sub_kategori)
                 if (catalogModel.deleteSubKategori(selectedKat.getIdKategori(), idSub)) {
                     refreshSubKategori.run();
                 } else {

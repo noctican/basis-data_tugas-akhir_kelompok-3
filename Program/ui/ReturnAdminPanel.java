@@ -17,7 +17,10 @@ public class ReturnAdminPanel extends JPanel {
         setLayout(new BorderLayout());
         add(GUIHelper.createContentHeader("Returns Validation"), BorderLayout.NORTH);
 
-        returnModelT = new DefaultTableModel(new String[]{"Retur ID", "Trx ID", "Product", "SKU", "Qty", "Reason"}, 0);
+        returnModelT = new DefaultTableModel(new String[]{"Retur ID", "Trx ID", "Product", "SKU", "Qty", "Reason"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) { return false; }
+        };
         returnTable = new JTable(returnModelT);
         add(new JScrollPane(returnTable), BorderLayout.CENTER);
 

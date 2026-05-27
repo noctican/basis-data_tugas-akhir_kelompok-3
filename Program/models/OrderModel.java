@@ -23,22 +23,23 @@ public class OrderModel {
                 t.setMetodePembayaran(rs.getString("metode_pembayaran"));
                 list.add(t);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) { 
+            e.printStackTrace(); 
+        }
         return list;
     }
 
-    public boolean shipOrder(int idTransaksi, String ekspedisi) {
+    public boolean shipOrder(int idTransaksi, String resi) {
         Connection conn = null;
         try {
             conn = DatabaseConfig.getConnection();
             conn.setAutoCommit(false);
 
-            String resi = "RE-" + System.currentTimeMillis();
             String sqlP = "INSERT INTO pengiriman (no_resi, id_transaksi, nama_ekspedisi, status_pengiriman) VALUES (?, ?, ?, 'SHIPPED')";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlP)) {
                 pstmt.setString(1, resi);
                 pstmt.setInt(2, idTransaksi);
-                pstmt.setString(3, ekspedisi);
+                pstmt.setString(3, "-");
                 pstmt.executeUpdate();
             }
 
@@ -55,7 +56,11 @@ public class OrderModel {
             e.printStackTrace();
             return false;
         } finally {
-            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+            try { 
+                if (conn != null) conn.setAutoCommit(true); 
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 }

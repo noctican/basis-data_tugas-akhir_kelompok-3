@@ -55,7 +55,6 @@ public class CatalogModel {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    // --- Produk CRUD ---
     public List<Produk> searchProduk(String keyword) {
         List<Produk> list = new ArrayList<>();
         String sql = "SELECT * FROM produk WHERE nama_produk LIKE ? OR deskripsi_produk LIKE ?";

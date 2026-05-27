@@ -7,8 +7,8 @@ import java.sql.SQLException;
 public class DatabaseConfig {
     private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=db_eiger;encrypt=true;trustServerCertificate=true;";
     private static final String USER = "sa";
-    private static final String PASSWORD = "chila123";
-
+    private static final String PASSWORD = "FilkomUB2026";
+    
     private static Connection connection = null;
 
     public static Connection getConnection() throws SQLException {

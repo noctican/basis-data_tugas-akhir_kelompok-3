@@ -63,7 +63,6 @@ public class TransactionModel {
     }
 
     public boolean addToCart(DetailKeranjang d) {
-        // MERGE like logic
         String check = "SELECT kuantitas, sub_total FROM detail_keranjang WHERE id_keranjang = ? AND id_produk = ? AND sku = ?";
         try (Connection conn = DatabaseConfig.getConnection()) {
             try (PreparedStatement cstmt = conn.prepareStatement(check)) {
@@ -109,7 +108,6 @@ public class TransactionModel {
             BigDecimal total = BigDecimal.ZERO;
             for (DetailKeranjang item : items) total = total.add(item.getSubTotal());
 
-            // 1. Transaksi
             int idTransaksi = -1;
             String sqlT = "INSERT INTO transaksi (total_pembelian, metode_pembayaran) VALUES (?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlT, Statement.RETURN_GENERATED_KEYS)) {
@@ -121,7 +119,6 @@ public class TransactionModel {
                 }
             }
 
-            // 2. Pelanggan_transaksi
             String sqlPT = "INSERT INTO pelanggan_transaksi (id_pengguna, id_transaksi) VALUES (?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlPT)) {
                 pstmt.setInt(1, idPengguna);
@@ -129,7 +126,6 @@ public class TransactionModel {
                 pstmt.executeUpdate();
             }
 
-            // 3. Detail_transaksi & Update stock
             String sqlDT = "INSERT INTO detail_transaksi (id_transaksi, id_produk, sku, harga_pembelian, kuantitas) VALUES (?, ?, ?, ?, ?)";
             String sqlStock = "UPDATE varian_produk SET stock = stock - ? WHERE id_produk = ? AND sku = ?";
             try (PreparedStatement pstmtDT = conn.prepareStatement(sqlDT);
@@ -149,7 +145,6 @@ public class TransactionModel {
                 }
             }
 
-            // 4. Clear Cart
             String sqlClear = "DELETE FROM detail_keranjang WHERE id_keranjang = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlClear)) {
                 pstmt.setInt(1, idKeranjang);

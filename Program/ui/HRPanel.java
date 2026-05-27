@@ -28,15 +28,12 @@ public class HRPanel extends JPanel {
         this.userModel = new UserModel();
         setLayout(new BorderLayout(10, 10));
 
-        // 1. Load info karyawan yang login & departemennya
         loadCurrentUserInfo();
 
-        // 2. Susun Layout Panel
-        setupTopPanel();      // Info Departemen Saat Ini
-        setupCenterPanel();   // Anggota Departemen & Departemen Lain + Tombol Aksi Karyawan
-        setupBottomPanel();   // Tombol Aksi Departemen
+        setupTopPanel();
+        setupCenterPanel();
+        setupBottomPanel();
 
-        // 3. Isi Data ke Tabel
         refreshDepartmentMembers();
         refreshOtherDepts();
     }
@@ -83,9 +80,6 @@ public class HRPanel extends JPanel {
     private void setupCenterPanel() {
         JPanel mainCenter = new JPanel(new GridLayout(2, 1, 10, 10));
 
-        // ==========================================
-        // PANAL ANGGOTA DEPARTEMEN SAYA + TOMBOL AKSI KARYAWAN
-        // ==========================================
         JPanel memberPanel = new JPanel(new BorderLayout());
         memberPanel.setBorder(BorderFactory.createTitledBorder("Your Department Members"));
 
@@ -96,13 +90,12 @@ public class HRPanel extends JPanel {
         memberTable = new JTable(memberModel);
         memberPanel.add(new JScrollPane(memberTable), BorderLayout.CENTER);
 
-        // Tambahkan panel tombol khusus manajemen Karyawan di bawah tabel anggota
         JPanel memberActionPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
         JButton addEmpBtn = new JButton("Add Member");
         JButton editEmpBtn = new JButton("Edit Member");
         JButton deleteEmpBtn = new JButton("Delete Member");
 
-        addEmpBtn.addActionListener(e -> showEmpDialog(null, null)); // Mode Tambah Karyawan
+        addEmpBtn.addActionListener(e -> showEmpDialog(null, null));
         
         editEmpBtn.addActionListener(e -> {
             int row = memberTable.getSelectedRow();
@@ -116,7 +109,7 @@ public class HRPanel extends JPanel {
             Karyawan k = userModel.getKaryawanById(idPengguna);
             
             if (p != null && k != null) {
-                showEmpDialog(p, k); // Mode Edit Karyawan
+                showEmpDialog(p, k);
             }
         });
 
@@ -154,9 +147,6 @@ public class HRPanel extends JPanel {
 
         mainCenter.add(memberPanel);
 
-        // ==========================================
-        // PANEL DEPARTEMEN LAIN
-        // ==========================================
         JPanel otherDeptPanel = new JPanel(new BorderLayout());
         otherDeptPanel.setBorder(BorderFactory.createTitledBorder("Other Departments"));
 
@@ -165,7 +155,7 @@ public class HRPanel extends JPanel {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         deptTable = new JTable(deptModel);
-        deptTable.removeColumn(deptTable.getColumnModel().getColumn(4)); // Sembunyikan ID Manager visualnya
+        deptTable.removeColumn(deptTable.getColumnModel().getColumn(4));
         
         otherDeptPanel.add(new JScrollPane(deptTable), BorderLayout.CENTER);
         mainCenter.add(otherDeptPanel);
@@ -255,7 +245,6 @@ public class HRPanel extends JPanel {
         }
     }
 
-    // Menggabungkan dialog Tambah & Edit Karyawan
     private void showEmpDialog(Pengguna pToEdit, Karyawan kToEdit) {
         boolean isEditMode = (pToEdit != null && kToEdit != null);
         String title = isEditMode ? "Edit Employee Member" : "Add New Employee Member";
@@ -267,11 +256,10 @@ public class HRPanel extends JPanel {
         JTextField phoneF = new JTextField(isEditMode ? pToEdit.getNomorTelepon() : "");
         JTextField jabatanF = new JTextField(isEditMode ? kToEdit.getJabatan() : "");
         
-        // Pilihan departemen dikunci otomatis ke departemen user saat ini (kecuali jika belum punya departemen)
         JComboBox<Departemen> deptC = new JComboBox<>();
         if (currentDept != null) {
             deptC.addItem(currentDept);
-            deptC.setEnabled(false); // Anggota baru otomatis masuk ke departemen "Kita"
+            deptC.setEnabled(false);
         } else {
             List<Departemen> depts = userModel.getAllDepartemen();
             for (Departemen d : depts) deptC.addItem(d);
@@ -303,7 +291,6 @@ public class HRPanel extends JPanel {
                 boolean success;
                 if (isEditMode) {
                     kToEdit.setJabatan(jabatanF.getText());
-                    // Update data gabungan pengguna + karyawan
                     success = userModel.updateEmployee(p, kToEdit);
                 } else {
                     success = userModel.addEmployee(p, targetDeptId, jabatanF.getText());

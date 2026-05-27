@@ -9,7 +9,6 @@ import java.util.List;
 
 public class UserModel {
     
-    // --- Departemen CRUD ---
     public List<Departemen> getAllDepartemen() {
         List<Departemen> list = new ArrayList<>();
         String sql = "SELECT * FROM departemen";
@@ -44,7 +43,7 @@ public class UserModel {
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
-        return null; // Not found
+        return null;
     }
 
     public Departemen getDepartemenById(int idDepartemen) {
@@ -126,7 +125,6 @@ public class UserModel {
         return list;
     }
 
-
     public boolean addDepartemen(Departemen d) {
         String sql = "INSERT INTO departemen (nama_departemen, lokasi, deskripsi_tugas) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
@@ -138,14 +136,12 @@ public class UserModel {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    // --- Employee Transactional CRUD ---
     public boolean addEmployee(Pengguna p, int idDept, String jabatan) {
         Connection conn = null;
         try {
             conn = DatabaseConfig.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Insert Pengguna
             String sqlP = "INSERT INTO pengguna (email, nama_depan, nama_belakang, password, nomor_telepon) VALUES (?, ?, ?, ?, ?)";
             int idPengguna = -1;
             try (PreparedStatement pstmt = conn.prepareStatement(sqlP, Statement.RETURN_GENERATED_KEYS)) {
@@ -160,7 +156,6 @@ public class UserModel {
                 }
             }
 
-            // 2. Insert Karyawan
             String sqlK = "INSERT INTO karyawan (id_pengguna, id_departemen, jabatan) VALUES (?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlK)) {
                 pstmt.setInt(1, idPengguna);
@@ -180,7 +175,66 @@ public class UserModel {
         }
     }
 
-    // --- Member CRUD ---
+    public boolean updateEmployee(Pengguna p, Karyawan k) {
+        String sqlPengguna = "UPDATE pengguna SET email = ?, nama_depan = ?, nama_belakang = ?, password = ?, nomor_telepon = ? WHERE id_pengguna = ?";
+        String sqlKaryawan = "UPDATE karyawan SET jabatan = ? WHERE id_pengguna = ?";
+        Connection conn = null;
+        try {
+            conn = DatabaseConfig.getConnection();
+            conn.setAutoCommit(false);
+            
+            try (PreparedStatement stmtP = conn.prepareStatement(sqlPengguna)) {
+                stmtP.setString(1, p.getEmail());
+                stmtP.setString(2, p.getNamaDepan());
+                stmtP.setString(3, p.getNamaBelakang());
+                stmtP.setString(4, p.getPassword());
+                stmtP.setString(5, p.getNomorTelepon());
+                stmtP.setInt(6, p.getIdPengguna());
+                stmtP.executeUpdate();
+            }
+            try (PreparedStatement stmtK = conn.prepareStatement(sqlKaryawan)) {
+                stmtK.setString(1, k.getJabatan());
+                stmtK.setInt(2, k.getIdPengguna());
+                stmtK.executeUpdate();
+            }
+            conn.commit();
+            return true;
+        } catch (SQLException ex) {
+            DBHelper.rollback(conn);
+            ex.printStackTrace();
+            return false;
+        } finally {
+            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+        }
+    }
+
+    public boolean deleteEmployee(int idPengguna) {
+        String sqlKaryawan = "DELETE FROM karyawan WHERE id_pengguna = ?";
+        String sqlPengguna = "DELETE FROM pengguna WHERE id_pengguna = ?";
+        Connection conn = null;
+        try {
+            conn = DatabaseConfig.getConnection();
+            conn.setAutoCommit(false);
+            
+            try (PreparedStatement stmtK = conn.prepareStatement(sqlKaryawan)) {
+                stmtK.setInt(1, idPengguna);
+                stmtK.executeUpdate();
+            }
+            try (PreparedStatement stmtP = conn.prepareStatement(sqlPengguna)) {
+                stmtP.setInt(1, idPengguna);
+                stmtP.executeUpdate();
+            }
+            conn.commit();
+            return true;
+        } catch (SQLException ex) {
+            DBHelper.rollback(conn);
+            ex.printStackTrace();
+            return false;
+        } finally {
+            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+        }
+    }
+
     public List<Member> getAllMembers() {
         List<Member> list = new ArrayList<>();
         String sql = "SELECT * FROM member";
@@ -199,14 +253,68 @@ public class UserModel {
         return list;
     }
 
-    // --- Customer Transactional CRUD ---
+    public boolean addMember(Member m) {
+        String sql = "INSERT INTO member (jenis, poin, voucher_price, voucher_percentage) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, m.getJenis());
+            pstmt.setInt(2, m.getPoin());
+            pstmt.setBigDecimal(3, m.getVoucherPrice());
+            pstmt.setBigDecimal(4, m.getVoucherPercentage());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public boolean updateMember(Member m) {
+        String sql = "UPDATE member SET poin = ?, voucher_price = ?, voucher_percentage = ? WHERE jenis = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, m.getPoin());
+            pstmt.setBigDecimal(2, m.getVoucherPrice());
+            pstmt.setBigDecimal(3, m.getVoucherPercentage());
+            pstmt.setString(4, m.getJenis());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public boolean deleteMember(String jenis) {
+        String sql = "DELETE FROM member WHERE jenis = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, jenis);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public List<Object[]> getAllCustomers() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT p.*, pl.jenis_member FROM pengguna p JOIN pelanggan pl ON p.id_pengguna = pl.id_pengguna";
+        try (Connection conn = DatabaseConfig.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Pengguna p = new Pengguna();
+                p.setIdPengguna(rs.getInt("id_pengguna"));
+                p.setEmail(rs.getString("email"));
+                p.setNamaDepan(rs.getString("nama_depan"));
+                p.setNamaBelakang(rs.getString("nama_belakang"));
+                p.setPassword(rs.getString("password"));
+                p.setNomorTelepon(rs.getString("nomor_telepon"));
+                
+                String jenisMember = rs.getString("jenis_member");
+                
+                list.add(new Object[]{p, jenisMember});
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
     public boolean addCustomer(Pengguna p, String jenisMember) {
         Connection conn = null;
         try {
             conn = DatabaseConfig.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Insert Pengguna
             String sqlP = "INSERT INTO pengguna (email, nama_depan, nama_belakang, password, nomor_telepon) VALUES (?, ?, ?, ?, ?)";
             int idPengguna = -1;
             try (PreparedStatement pstmt = conn.prepareStatement(sqlP, Statement.RETURN_GENERATED_KEYS)) {
@@ -221,7 +329,6 @@ public class UserModel {
                 }
             }
 
-            // 2. Insert Pelanggan
             String sqlC = "INSERT INTO pelanggan (id_pengguna, jenis_member) VALUES (?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlC)) {
                 pstmt.setInt(1, idPengguna);
@@ -234,6 +341,66 @@ public class UserModel {
         } catch (SQLException e) {
             DBHelper.rollback(conn);
             e.printStackTrace();
+            return false;
+        } finally {
+            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+        }
+    }
+
+    public boolean updateCustomer(Pengguna p, String jenisMember) {
+        String sqlPengguna = "UPDATE pengguna SET email = ?, nama_depan = ?, nama_belakang = ?, password = ?, nomor_telepon = ? WHERE id_pengguna = ?";
+        String sqlPelanggan = "UPDATE pelanggan SET jenis_member = ? WHERE id_pengguna = ?";
+        Connection conn = null;
+        try {
+            conn = DatabaseConfig.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmtP = conn.prepareStatement(sqlPengguna)) {
+                stmtP.setString(1, p.getEmail());
+                stmtP.setString(2, p.getNamaDepan());
+                stmtP.setString(3, p.getNamaBelakang());
+                stmtP.setString(4, p.getPassword());
+                stmtP.setString(5, p.getNomorTelepon());
+                stmtP.setInt(6, p.getIdPengguna());
+                stmtP.executeUpdate();
+            }
+            try (PreparedStatement stmtC = conn.prepareStatement(sqlPelanggan)) {
+                stmtC.setString(1, jenisMember);
+                stmtC.setInt(2, p.getIdPengguna());
+                stmtC.executeUpdate();
+            }
+            conn.commit();
+            return true;
+        } catch (SQLException ex) {
+            DBHelper.rollback(conn);
+            ex.printStackTrace();
+            return false;
+        } finally {
+            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+        }
+    }
+
+    public boolean deleteCustomer(int idPengguna) {
+        String sqlPelanggan = "DELETE FROM pelanggan WHERE id_pengguna = ?";
+        String sqlPengguna = "DELETE FROM pengguna WHERE id_pengguna = ?";
+        Connection conn = null;
+        try {
+            conn = DatabaseConfig.getConnection();
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement stmtC = conn.prepareStatement(sqlPelanggan)) {
+                stmtC.setInt(1, idPengguna);
+                stmtC.executeUpdate();
+            }
+            try (PreparedStatement stmtP = conn.prepareStatement(sqlPengguna)) {
+                stmtP.setInt(1, idPengguna);
+                stmtP.executeUpdate();
+            }
+            conn.commit();
+            return true;
+        } catch (SQLException ex) {
+            DBHelper.rollback(conn);
+            ex.printStackTrace();
             return false;
         } finally {
             try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
@@ -261,85 +428,5 @@ public class UserModel {
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
-    }
-
-    // 1. Method Update Data Gabungan Pengguna & Karyawan (Transactional)
-    public boolean updateEmployee(Pengguna p, Karyawan k) {
-        String sqlPengguna = "UPDATE pengguna SET email = ?, nama_depan = ?, nama_belakang = ?, password = ?, nomor_telepon = ? WHERE id_pengguna = ?";
-        String sqlKaryawan = "UPDATE karyawan SET jabatan = ? WHERE id_pengguna = ?";
-        
-        Connection conn = null;
-        try {
-            conn = DatabaseConfig.getConnection();
-            conn.setAutoCommit(false); // Nyalakan mode transaksi ACID
-            
-            // Update data dasar Pengguna
-            try (PreparedStatement stmtP = conn.prepareStatement(sqlPengguna)) {
-                stmtP.setString(1, p.getEmail());
-                stmtP.setString(2, p.getNamaDepan());
-                stmtP.setString(3, p.getNamaBelakang());
-                stmtP.setString(4, p.getPassword());
-                stmtP.setString(5, p.getNomorTelepon());
-                stmtP.setInt(6, p.getIdPengguna());
-                stmtP.executeUpdate();
-            }
-            
-            // Update data spesifik Karyawan (Jabatan)
-            try (PreparedStatement stmtK = conn.prepareStatement(sqlKaryawan)) {
-                stmtK.setString(1, k.getJabatan());
-                stmtK.setInt(2, k.getIdPengguna());
-                stmtK.executeUpdate();
-            }
-            
-            conn.commit(); // Simpan jika keduanya sukses
-            return true;
-        } catch (SQLException ex) {
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
-            }
-            ex.printStackTrace();
-            return false;
-        } finally {
-            if (conn != null) {
-                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-            }
-        }
-    }
-
-    // 2. Method Hapus Data Karyawan sekaligus Akun Penggunanya (Transactional)
-    public boolean deleteEmployee(int idPengguna) {
-        String sqlKaryawan = "DELETE FROM karyawan WHERE id_pengguna = ?";
-        String sqlPengguna = "DELETE FROM pengguna WHERE id_pengguna = ?";
-        
-        Connection conn = null;
-        try {
-            conn = DatabaseConfig.getConnection();
-            conn.setAutoCommit(false); // Transaksi ACID aman
-            
-            // Hapus child table dulu (karyawan)
-            try (PreparedStatement stmtK = conn.prepareStatement(sqlKaryawan)) {
-                stmtK.setInt(1, idPengguna);
-                stmtK.executeUpdate();
-            }
-            
-            // Hapus parent table setelahnya (pengguna)
-            try (PreparedStatement stmtP = conn.prepareStatement(sqlPengguna)) {
-                stmtP.setInt(1, idPengguna);
-                stmtP.executeUpdate();
-            }
-            
-            conn.commit();
-            return true;
-        } catch (SQLException ex) {
-            if (conn != null) {
-                try { conn.rollback(); } catch (SQLException e) { e.printStackTrace(); }
-            }
-            ex.printStackTrace();
-            return false;
-        } finally {
-            if (conn != null) {
-                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
-            }
-        }
     }
 }
