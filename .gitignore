@@ -1,4 +1,4 @@
 .marscode/
 .env
-.env/*
-.config/*
+.env.*
+Program/config/*
