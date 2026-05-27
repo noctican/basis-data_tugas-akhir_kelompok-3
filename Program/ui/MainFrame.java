@@ -9,8 +9,10 @@ public class MainFrame extends JFrame {
     private JPanel sidebar;
     private JPanel contentArea;
     private CardLayout cardLayout;
+    private int loggedInUserId;
 
-    public MainFrame() {
+    public MainFrame(int userId) {
+        this.loggedInUserId = userId;
         setTitle("Eiger Store - " + (UserSession.getRole() == UserSession.Role.KARYAWAN ? "Admin Dashboard" : "Customer Portal"));
         setSize(1200, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -100,7 +102,7 @@ public class MainFrame extends JFrame {
         if (UserSession.getRole() == UserSession.Role.KARYAWAN) {
             contentArea.add(new DashboardPanel(), "DASHBOARD");
             contentArea.add(new CatalogPanel(), "CATALOG");
-            contentArea.add(new HRPanel(), "HR");
+            contentArea.add(new HRPanel(this.loggedInUserId), "HR");
             contentArea.add(new CustomerPanel(), "CUSTOMERS");
             contentArea.add(new OrderAdminPanel(), "ORDERS_ADMIN");
             contentArea.add(new ReturnAdminPanel(), "RETURNS_ADMIN");

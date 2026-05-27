@@ -65,9 +65,13 @@ public class LoginFrame extends JFrame {
         if (authModel.login(email, password)) {
             GUIHelper.showInfo(this, "Login successful! Welcome, " + UserSession.getCurrentUser().getNamaDepan());
             this.dispose();
-            SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
+            int loggedInUserId = UserSession.getCurrentUser().getIdPengguna();
+            MainFrame mainFrame = new MainFrame(loggedInUserId);
+            mainFrame.setVisible(true);
         } else {
             GUIHelper.showError(this, "Invalid credentials or user role not found.");
         }
+
+        
     }
 }
