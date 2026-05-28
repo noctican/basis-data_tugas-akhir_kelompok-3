@@ -6,6 +6,7 @@ import helpers.DBHelper;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 public class UserModel {
     
@@ -541,26 +542,19 @@ public class UserModel {
         return list;
     }
 
-    public boolean addTopup(int idCustomer, java.math.BigDecimal nominal) {
+    public boolean addTopup(int idCustomer, BigDecimal nominal) {
         Connection conn = null;
         try {
             conn = DatabaseConfig.getConnection();
             conn.setAutoCommit(false);
 
-            String sqlRT = "INSERT INTO riwayat_topup (id_pengguna, nominal, status) VALUES (?, ?, 'SUCCESS')";
+            String sqlRT = "INSERT INTO riwayat_topup (id_pengguna, nominal) VALUES (?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlRT)) {
                 pstmt.setInt(1, idCustomer);
                 pstmt.setBigDecimal(2, nominal);
                 pstmt.executeUpdate();
             }
-
-            String sqlW = "UPDATE pelanggan SET wallet = ISNULL(wallet, 0) + ? WHERE id_pengguna = ?";
-            try (PreparedStatement pstmt = conn.prepareStatement(sqlW)) {
-                pstmt.setBigDecimal(1, nominal);
-                pstmt.setInt(2, idCustomer);
-                pstmt.executeUpdate();
-            }
-
+            
             conn.commit();
             return true;
         } catch (SQLException e) {

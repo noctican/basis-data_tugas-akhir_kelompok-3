@@ -9,6 +9,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
+import java.math.BigDecimal;
 
 public class ProfilePanel extends JPanel {
     private UserModel userModel;
@@ -359,7 +360,7 @@ public class ProfilePanel extends JPanel {
         String nominalS = JOptionPane.showInputDialog(this, "Enter Topup Nominal:");
         if (nominalS != null) {
             try {
-                java.math.BigDecimal nominal = new java.math.BigDecimal(nominalS);
+                BigDecimal nominal = new BigDecimal(nominalS);
                 if (userModel.addTopup(UserSession.getCurrentUser().getIdPengguna(), nominal)) {
                     GUIHelper.showInfo(this, "Topup successful!");
                     refreshTopup();

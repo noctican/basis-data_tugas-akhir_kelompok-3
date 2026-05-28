@@ -76,8 +76,8 @@ public class MainFrame extends JFrame {
         addNavButton("Shop Products", "SHOP");
         addNavButton("My Cart", "CART");
         addNavButton("My Orders", "MY_ORDERS");
-        addNavButton("My Profile", "PROFILE");
         addNavButton("Returns & Help", "MY_RETURNS");
+        addNavButton("My Profile & Address", "PROFILE");
     }
 
     private void addNavButton(String text, String cardName) {
