@@ -589,18 +589,18 @@ public class UserModel {
     }
 
     public boolean processTopup(int idTopup, boolean isApproved) {
-        String sql = "{CALL sp_ResponseTopup(?, ?)}";
+        String sql = "{CALL sp_ResponseTopup(?, ?, ?)}";
 
         try (Connection conn = DatabaseConfig.getConnection();
             CallableStatement cs = conn.prepareCall(sql)) {
 
-            cs.setInt(0, idTopup);
-            cs.setBoolean(1, isApproved);
-            cs.registerOutParameter(2, Types.NVARCHAR);
+            cs.setInt(1, idTopup);
+            cs.setBoolean(2, isApproved);
+            cs.registerOutParameter(3, Types.NVARCHAR);
 
             cs.execute();
 
-            String pesan = cs.getString(2);
+            String pesan = cs.getString(3);
             boolean sukses = pesan != null && pesan.startsWith("SUKSES");
 
             if(sukses) GUIHelper.showInfo(null, pesan);
