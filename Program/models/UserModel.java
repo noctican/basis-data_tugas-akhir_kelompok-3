@@ -601,7 +601,7 @@ public class UserModel {
             cs.execute();
 
             String pesan = cs.getString(3);
-            boolean sukses = pesan != null && pesan.startsWith("SUKSES");
+            boolean sukses = pesan != null && pesan.startsWith("SUCCESS");
 
             if(sukses) GUIHelper.showInfo(null, pesan);
             else GUIHelper.showError(null, pesan);
