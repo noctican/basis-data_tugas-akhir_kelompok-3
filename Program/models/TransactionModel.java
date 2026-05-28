@@ -162,13 +162,10 @@ public class TransactionModel {
         }
     }
 
-    // Tambahkan import java.sql.* dan java.util.ArrayList jika belum ada
-
     public List<Object[]> getTop5PurchasedItems(int idPengguna) {
         List<Object[]> list = new ArrayList<>();
         String query = "SELECT Nama_Produk, Kategori, Total_Jumlah, Harga_Satuan FROM v_Top5BarangPelanggan WHERE ID_Pengguna = ?";
         
-        // Sesuaikan koneksi database yang kamu gunakan di project-mu
         try (Connection conn = DatabaseConfig.getConnection(); 
             PreparedStatement ps = conn.prepareStatement(query)) {
             
@@ -187,5 +184,30 @@ public class TransactionModel {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public boolean updateCartQuantity(int idKeranjang, int idProduk, String sku, int newQty) {
+        String sql = "UPDATE detail_keranjang SET kuantitas = ?, sub_total = (SELECT harga_base * ? FROM produk WHERE id_produk = ?) WHERE id_keranjang = ? AND id_produk = ? AND sku = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, newQty);
+            pstmt.setInt(2, newQty);
+            pstmt.setInt(3, idProduk);
+            pstmt.setInt(4, idKeranjang);
+            pstmt.setInt(5, idProduk);
+            pstmt.setString(6, sku);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public boolean deleteCartItem(int idKeranjang, int idProduk, String sku) {
+        String sql = "DELETE FROM detail_keranjang WHERE id_keranjang = ? AND id_produk = ? AND sku = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idKeranjang);
+            pstmt.setInt(2, idProduk);
+            pstmt.setString(3, sku);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 }
