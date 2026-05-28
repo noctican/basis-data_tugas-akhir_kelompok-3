@@ -161,4 +161,31 @@ public class TransactionModel {
             try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
         }
     }
+
+    // Tambahkan import java.sql.* dan java.util.ArrayList jika belum ada
+
+    public List<Object[]> getTop5PurchasedItems(int idPengguna) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT Nama_Produk, Kategori, Total_Jumlah, Harga_Satuan FROM v_Top5BarangPelanggan WHERE ID_Pengguna = ?";
+        
+        // Sesuaikan koneksi database yang kamu gunakan di project-mu
+        try (Connection conn = DatabaseConfig.getConnection(); 
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, idPengguna);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Object[]{
+                        rs.getString("Nama_Produk"),
+                        rs.getString("Kategori"),
+                        rs.getInt("Total_Jumlah"),
+                        rs.getBigDecimal("Harga_Satuan")
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

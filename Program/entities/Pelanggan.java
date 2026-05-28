@@ -2,7 +2,7 @@ package entities;
 
 import java.sql.Date;
 
-public class Pelanggan {
+public class Pelanggan extends Pengguna {
     private int idPengguna;
     private String jenisMember;
     private Date tanggalBergabung;

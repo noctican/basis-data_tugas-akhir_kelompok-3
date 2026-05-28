@@ -50,17 +50,15 @@ public class ProfilePanel extends JPanel {
         JButton addBtn = new JButton("Add New Address");
         addBtn.addActionListener(e -> showAddAlamatDialog());
         
-        // --- 1. TAMBAH TOMBOL EDIT ALAMAT ---
         JButton editAlamatBtn = new JButton("Edit Selected Address");
         editAlamatBtn.addActionListener(e -> handleEditAlamat());
         
-        // --- 2. TAMBAH TOMBOL HAPUS ALAMAT ---
         JButton deleteAlamatBtn = new JButton("Delete Selected Address");
         deleteAlamatBtn.addActionListener(e -> handleDeleteAlamat());
         
         bottomPanel.add(addBtn);
-        bottomPanel.add(editAlamatBtn);  // Masukkan ke panel
-        bottomPanel.add(deleteAlamatBtn); // Masukkan ke panel
+        bottomPanel.add(editAlamatBtn); 
+        bottomPanel.add(deleteAlamatBtn); 
 
         add(bottomPanel, BorderLayout.SOUTH);
     }
@@ -72,7 +70,6 @@ public class ProfilePanel extends JPanel {
             return;
         }
 
-        // Ambil data lama dari baris tabel yang di-klik user
         int idAlamat = (int) alamatModel.getValueAt(selectedRow, 0);
         String oldPenerima = (String) alamatModel.getValueAt(selectedRow, 1);
         String oldJalan = (String) alamatModel.getValueAt(selectedRow, 2);
@@ -80,7 +77,6 @@ public class ProfilePanel extends JPanel {
         String oldProvinsi = (String) alamatModel.getValueAt(selectedRow, 4);
         String oldTelp = (String) alamatModel.getValueAt(selectedRow, 5);
 
-        // Set text field langsung pakai data lama (Biar user tinggal ubah dikit)
         JTextField recipientF = new JTextField(oldPenerima);
         JTextField streetF = new JTextField(oldJalan);
         JTextField cityF = new JTextField(oldKota);
@@ -108,9 +104,6 @@ public class ProfilePanel extends JPanel {
         }
     }
 
-    // =========================================================================
-    // LOGIC HAPUS ALAMAT YANG DIPILIH DI TABEL
-    // =========================================================================
     private void handleDeleteAlamat() {
         int selectedRow = alamatTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -162,7 +155,6 @@ private void showAddAlamatDialog() {
         int option = JOptionPane.showConfirmDialog(this, message, "Add Address", JOptionPane.OK_CANCEL_OPTION);
         
         if (option == JOptionPane.OK_OPTION) {
-            // Validasi input sederhana agar tidak memasukkan data kosong
             if (recipientF.getText().trim().isEmpty() || streetF.getText().trim().isEmpty()) {
                 GUIHelper.showInfo(this, "Nama Penerima dan Jalan tidak boleh kosong!");
                 return;
@@ -170,7 +162,6 @@ private void showAddAlamatDialog() {
 
             int idPenggunaLogin = UserSession.getCurrentUser().getIdPengguna();
             
-            // Panggil fungsi insert melalui userModel yang sudah pasti aman
             boolean success = userModel.addAlamat(
                 idPenggunaLogin, 
                 provF.getText(), 
@@ -182,7 +173,7 @@ private void showAddAlamatDialog() {
             
             if (success) {
                 JOptionPane.showMessageDialog(this, "Alamat berhasil ditambahkan!");
-                refreshAlamat(); // Reload tabel otomatis akan berjalan lancar
+                refreshAlamat(); 
             } else {
                 GUIHelper.showInfo(this, "Gagal menambahkan alamat. Silakan cek log konsol.");
             }

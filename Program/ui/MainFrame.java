@@ -70,6 +70,7 @@ public class MainFrame extends JFrame {
     }
 
     private void setupCustomerSidebar() {
+        addNavButton("Dashboard & Analytics", "DASHBOARD");
         addNavButton("Shop Products", "SHOP");
         addNavButton("My Cart", "CART");
         addNavButton("My Orders", "MY_ORDERS");
@@ -107,6 +108,7 @@ public class MainFrame extends JFrame {
             contentArea.add(new OrderAdminPanel(), "ORDERS_ADMIN");
             contentArea.add(new ReturnAdminPanel(), "RETURNS_ADMIN");
         } else {
+            contentArea.add(new DashboardPelanggan(), "DASHBOARD");
             contentArea.add(new ShopPanel(), "SHOP");
             contentArea.add(new CartPanel(), "CART");
             contentArea.add(createPlaceholder("Your Order History"), "MY_ORDERS");
