@@ -450,16 +450,16 @@ GO
 -- 17. RETUR
 SET IDENTITY_INSERT retur ON;
 INSERT INTO retur (id_retur, id_transaksi, tanggal_pengembalian, status, id_validator) VALUES
-( 1, 16, '2025-01-25', 'ditolak',   7),
-( 2,  6, '2025-01-30', 'ditolak',   7),
-( 3, 10, '2025-02-04', 'selesai',   4),
-( 4, 17, '2025-02-09', 'selesai',   1),
-( 5,  5, '2025-02-14', 'disetujui', 8),
-( 6, 17, '2025-02-19', 'disetujui', 8),
-( 7,  7, '2025-02-24', 'selesai',   4),
-( 8, 19, '2025-03-01', 'selesai',   1),
-( 9, 39, '2025-03-06', 'disetujui', 8),
-(10, 15, '2025-03-11', 'ditolak',   4);
+( 1, 16, '2025-01-25', 'pending', 7),
+( 2,  6, '2025-01-30', 'pending', 7),
+( 3, 10, '2025-02-04', 'pending', 4),
+( 4, 17, '2025-02-09', 'pending', 1),
+( 5,  5, '2025-02-14', 'pending', 8),
+( 6, 17, '2025-02-19', 'pending', 8),
+( 7,  7, '2025-02-24', 'pending', 4),
+( 8, 19, '2025-03-01', 'pending', 1),
+( 9, 39, '2025-03-06', 'pending', 8),
+(10, 15, '2025-03-11', 'pending', 4);
 SET IDENTITY_INSERT retur OFF;
 GO
 
