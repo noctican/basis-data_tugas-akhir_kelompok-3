@@ -429,4 +429,50 @@ public class UserModel {
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
+
+    public boolean updateAlamat(int idAlamat, String provinsi, String kota, String jalan, String namaPenerima, String noTelp) {
+        String sql = "UPDATE alamat_pelanggan SET provinsi = ?, kota = ?, jalan = ?, nama_penerima = ?, no_telp = ? WHERE id_alamat = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, provinsi);
+            ps.setString(2, kota);
+            ps.setString(3, jalan);
+            ps.setString(4, namaPenerima);
+            ps.setString(5, noTelp);
+            ps.setInt(6, idAlamat);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteAlamat(int idAlamat) {
+        String sql = "DELETE FROM alamat_pelanggan WHERE id_alamat = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idAlamat);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean addAlamat(int idPengguna, String provinsi, String kota, String jalan, String namaPenerima, String noTelp) {
+        String sql = "INSERT INTO alamat_pelanggan (id_pengguna, provinsi, kota, jalan, nama_penerima, no_telp) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConfig.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, idPengguna);
+        ps.setString(2, provinsi);
+        ps.setString(3, kota);
+        ps.setString(4, jalan);
+        ps.setString(5, namaPenerima);
+        ps.setString(6, noTelp);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
 }
