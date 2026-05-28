@@ -42,20 +42,16 @@ public class CartPanel extends JPanel {
         totalLabel.setFont(new Font("Arial", Font.BOLD, 16));
         bottom.add(totalLabel, BorderLayout.WEST);
 
-        // Panel khusus untuk menampung tombol aksi di sebelah kanan
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
-        // Tombol Edit Kuantitas
         JButton editBtn = new JButton("Edit Qty");
         editBtn.addActionListener(e -> handleEditQuantity());
         actionPanel.add(editBtn);
 
-        // Tombol Hapus Item
         JButton deleteBtn = new JButton("Delete Item");
         deleteBtn.addActionListener(e -> handleDeleteItem());
         actionPanel.add(deleteBtn);
 
-        // Tombol Checkout
         JButton checkoutBtn = new JButton("Checkout Now");
         checkoutBtn.addActionListener(e -> handleCheckout());
         actionPanel.add(checkoutBtn);
@@ -65,6 +61,9 @@ public class CartPanel extends JPanel {
     }
 
     public void refreshCart() {
+        // Otomatis bersihkan transaksi expired (>10 menit) di DB sebelum merender ulang halaman belanja
+        transactionModel.cekExpiredPembayaran();
+
         cartModel.setRowCount(0);
         currentCart = transactionModel.getOrCreateCart(UserSession.getCurrentUser().getIdPengguna());
         List<DetailKeranjang> items = transactionModel.getCartDetails(currentCart.getIdKeranjang());
@@ -73,7 +72,60 @@ public class CartPanel extends JPanel {
             cartModel.addRow(new Object[]{d.getIdProduk(), d.getSku(), d.getKuantitas(), d.getSubTotal()});
             total = total.add(d.getSubTotal());
         }
-        totalLabel.setText("Total: " + total.toString());
+        totalLabel.setText("Total: Rp " + total.toString());
+    }
+
+    private void handleCheckout() {
+        if (cartModel.getRowCount() == 0) { 
+            GUIHelper.showError(this, "Cart is empty!"); 
+            return; 
+        }
+
+        // 1. Pilih metode pembayaran (Sesuai parameter sp_Checkout_Reservasi_HapusKeranjang)
+        String[] methods = {"Wallet"};
+        String selectedMethod = (String) JOptionPane.showInputDialog(
+                this, "Select Payment Method:", "Checkout Confirmation", 
+                JOptionPane.QUESTION_MESSAGE, null, methods, methods[0]
+        );
+        
+        if (selectedMethod == null) return; // User cancel dialog pemilihan metode
+
+        int currentUserId = UserSession.getCurrentUser().getIdPengguna();
+        StringBuilder errorBuffer = new StringBuilder();
+
+        // 2. Eksekusi Stored Procedure Tahap 1: Membuat Transaksi PENDING & Mengosongkan Keranjang
+        int newTransactionId = transactionModel.checkoutReservasi(currentUserId, selectedMethod, errorBuffer);
+
+        if (newTransactionId > 0) {
+            // Berhasil reservasi stok dan membuat ID transaksi baru
+            JOptionPane.showMessageDialog(this, 
+                    "Checkout Sukses!\nID Transaksi Anda: #" + newTransactionId + 
+                    "\nStatus: PENDING\n\nCatatan: Selesaikan pembayaran dalam waktu 10 menit atau pesanan otomatis dibatalkan.", 
+                    "Informasi Transaksi", JOptionPane.INFORMATION_MESSAGE);
+            
+            // Refresh tabel keranjang (sekarang harusnya sudah kosong karena dihapus oleh SP)
+            refreshCart();
+
+            // 3. Eksekusi Stored Procedure Tahap 2: Menawarkan pembayaran instan menggunakan Wallet
+            int payConfirm = JOptionPane.showConfirmDialog(this, 
+                    "Apakah Anda ingin langsung membayar Transaksi #" + newTransactionId + " menggunakan Saldo Wallet?", 
+                    "Bayar Sekarang", JOptionPane.YES_NO_OPTION);
+
+            if (payConfirm == JOptionPane.YES_OPTION) {
+                // Menjalankan sp_BayarTransaksi
+                String hasilPembayaran = transactionModel.bayarTransaksi(currentUserId, newTransactionId);
+                
+                if (hasilPembayaran.startsWith("SUKSES")) {
+                    JOptionPane.showMessageDialog(this, hasilPembayaran, "Pembayaran Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // Menampilkan pesan error spesifik dari kembalian RAISERROR / OUTPUT SP (Misal: Saldo kurang, dsb)
+                    JOptionPane.showMessageDialog(this, hasilPembayaran, "Pembayaran Gagal", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } else {
+            // Gagal karena validasi internal SP (misal: stok mendadak tidak cukup)
+            GUIHelper.showError(this, "Checkout Gagal: " + errorBuffer.toString());
+        }
     }
 
     private void handleEditQuantity() {
@@ -83,14 +135,11 @@ public class CartPanel extends JPanel {
             return;
         }
 
-        // Mengambil data ID Produk dan Kuantitas saat ini dari baris yang dipilih
         int idProduk = (int) cartModel.getValueAt(selectedRow, 0);
         String sku = (String) cartModel.getValueAt(selectedRow, 1);
         int currentQty = (int) cartModel.getValueAt(selectedRow, 2);
 
-        // Menampilkan dialog input untuk kuantitas baru
         String input = JOptionPane.showInputDialog(this, "Enter new quantity:", currentQty);
-        
         if (input != null && !input.trim().isEmpty()) {
             try {
                 int newQty = Integer.parseInt(input);
@@ -98,8 +147,6 @@ public class CartPanel extends JPanel {
                     GUIHelper.showError(this, "Quantity must be greater than 0!");
                     return;
                 }
-
-                // Panggil method update di TransactionModel Anda (sesuaikan namanya jika berbeda)
                 if (transactionModel.updateCartQuantity(currentCart.getIdKeranjang(), idProduk, sku, newQty)) {
                     GUIHelper.showInfo(this, "Quantity updated successfully!");
                     refreshCart();
@@ -122,33 +169,15 @@ public class CartPanel extends JPanel {
         int idProduk = (int) cartModel.getValueAt(selectedRow, 0);
         int confirm = JOptionPane.showConfirmDialog(this, 
                 "Are you sure you want to delete this item from the cart?", 
-                "Delete Confirmation", 
-                JOptionPane.YES_NO_OPTION);
+                "Delete Confirmation", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
             String sku = (String) cartModel.getValueAt(selectedRow, 1);
-            // Panggil method delete di TransactionModel Anda (sesuaikan namanya jika berbeda)
             if (transactionModel.deleteCartItem(currentCart.getIdKeranjang(), idProduk, sku)) {
                 GUIHelper.showInfo(this, "Item successfully deleted.");
                 refreshCart();
             } else {
                 GUIHelper.showError(this, "Failed to delete item.");
-            }
-        }
-    }
-
-    private void handleCheckout() {
-        if (cartModel.getRowCount() == 0) { GUIHelper.showError(this, "Cart is empty!"); return; }
-
-        String[] methods = {"Wallet"};
-        String selectedMethod = (String) JOptionPane.showInputDialog(this, "Select Payment Method:", "Checkout", JOptionPane.QUESTION_MESSAGE, null, methods, methods[0]);
-        
-        if (selectedMethod != null) {
-            if (transactionModel.checkout(UserSession.getCurrentUser().getIdPengguna(), currentCart.getIdKeranjang(), selectedMethod)) {
-                GUIHelper.showInfo(this, "Checkout successful! Your order is being processed.");
-                refreshCart();
-            } else {
-                GUIHelper.showError(this, "Checkout failed.");
             }
         }
     }
