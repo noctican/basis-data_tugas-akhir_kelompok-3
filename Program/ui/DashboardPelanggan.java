@@ -51,7 +51,7 @@ public class DashboardPelanggan extends JPanel {
     private void setupIdentityPanel() {
         JPanel identityPanel = new JPanel(new GridBagLayout());
         identityPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Identitas Diri", 
+                BorderFactory.createEtchedBorder(), "Identity & Membership Information", 
                 TitledBorder.LEFT, TitledBorder.TOP, new Font("Arial", Font.BOLD, 14)));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -60,14 +60,14 @@ public class DashboardPelanggan extends JPanel {
 
         // 1. Nama Depan
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.0;
-        identityPanel.add(new JLabel("Nama Depan:"), gbc);
+        identityPanel.add(new JLabel("First Name:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtNamaDepan = new JTextField(20);
         identityPanel.add(txtNamaDepan, gbc);
 
         // 2. Nama Belakang
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.0;
-        identityPanel.add(new JLabel("Nama Belakang:"), gbc);
+        identityPanel.add(new JLabel("Last Name:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtNamaBelakang = new JTextField(20);
         identityPanel.add(txtNamaBelakang, gbc);
@@ -89,7 +89,7 @@ public class DashboardPelanggan extends JPanel {
 
         // 5. Jenis Member (Read-Only)
         gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0.0;
-        identityPanel.add(new JLabel("Jenis Member:"), gbc);
+        identityPanel.add(new JLabel("Membership Type:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtJenisMember = new JTextField(20);
         txtJenisMember.setEditable(false);
@@ -98,7 +98,7 @@ public class DashboardPelanggan extends JPanel {
 
         // 6. Poin (Read-Only)
         gbc.gridx = 0; gbc.gridy = 5; gbc.weightx = 0.0;
-        identityPanel.add(new JLabel("Poin:"), gbc);
+        identityPanel.add(new JLabel("Points:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtPoin = new JTextField(20);
         txtPoin.setEditable(false);
@@ -107,7 +107,7 @@ public class DashboardPelanggan extends JPanel {
 
         // 7. Tanggal Bergabung (Read-Only)
         gbc.gridx = 0; gbc.gridy = 6; gbc.weightx = 0.0;
-        identityPanel.add(new JLabel("Tanggal Bergabung:"), gbc);
+        identityPanel.add(new JLabel("Join Date:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtTanggalGabung = new JTextField(20);
         txtTanggalGabung.setEditable(false);
@@ -117,18 +117,18 @@ public class DashboardPelanggan extends JPanel {
         // Panel Khusus Tombol (Diposisikan di gridy = 7 agar TIDAK MENUMPUK)
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         
-        btnHapusAkun = new JButton("Hapus Akun");
+        btnHapusAkun = new JButton("Delete Account");
         btnHapusAkun.setBackground(new Color(220, 53, 69)); // Warna merah danger
         btnHapusAkun.setForeground(Color.WHITE);
         btnHapusAkun.addActionListener(e -> handleHapusAkun());
         buttonPanel.add(btnHapusAkun);
 
-        btnBatal = new JButton("Batal");
+        btnBatal = new JButton("Cancel");
         btnBatal.setVisible(false); 
         btnBatal.addActionListener(e -> handleCancel());
         buttonPanel.add(btnBatal);
 
-        btnAction = new JButton("Edit Profil");
+        btnAction = new JButton("Edit Profile");
         btnAction.addActionListener(e -> handleActionButton());
         buttonPanel.add(btnAction);
 
@@ -143,10 +143,10 @@ public class DashboardPelanggan extends JPanel {
     private void setupTopProductsPanel() {
         JPanel productsPanel = new JPanel(new BorderLayout());
         productsPanel.setBorder(BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "5 Barang Paling Sering Dibeli", 
+                BorderFactory.createEtchedBorder(), "5 Top Purchased Items", 
                 TitledBorder.LEFT, TitledBorder.TOP, new Font("Arial", Font.BOLD, 14)));
 
-        tableModel = new DefaultTableModel(new String[]{"Nama Produk", "Kategori", "Total Jumlah", "Harga Satuan"}, 0) {
+        tableModel = new DefaultTableModel(new String[]{"Product Name", "Category", "Total Quantity", "Unit Price"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
         };
@@ -204,7 +204,7 @@ public class DashboardPelanggan extends JPanel {
         if (!isEditMode) {
             isEditMode = true;
             setFieldsEditable(true);
-            btnAction.setText("Simpan Perubahan");
+            btnAction.setText("Save Changes");
             btnBatal.setVisible(true);
             btnHapusAkun.setVisible(false); // Sembunyikan hapus akun saat sedang mengedit
         } else {
@@ -214,7 +214,7 @@ public class DashboardPelanggan extends JPanel {
             String passwordBaru = new String(txtPassword.getPassword()).trim();
 
             if (namaDepanBaru.isEmpty() || emailBaru.isEmpty() || passwordBaru.isEmpty()) {
-                GUIHelper.showError(this, "Nama Depan, Email, dan Password harus diisi!");
+                GUIHelper.showError(this, "First Name, Email, and Password must be filled out!");
                 return;
             }
 
@@ -230,14 +230,14 @@ public class DashboardPelanggan extends JPanel {
                 boolean success = true; 
 
                 if (success) {
-                    GUIHelper.showInfo(this, "Identitas berhasil diperbarui!");
+                    GUIHelper.showInfo(this, "Profile successfully updated!");
                     isEditMode = false;
                     setFieldsEditable(false);
                     btnAction.setText("Edit Profil");
                     btnBatal.setVisible(false);
                     btnHapusAkun.setVisible(true);
                 } else {
-                    GUIHelper.showError(this, "Gagal memperbarui identitas di database.");
+                    GUIHelper.showError(this, "Failed to update profile in database.");
                 }
             }
         }
@@ -258,8 +258,8 @@ public class DashboardPelanggan extends JPanel {
 
         // Tampilkan dialog konfirmasi kepada user
         int confirm = JOptionPane.showConfirmDialog(this, 
-                "Apakah Anda yakin ingin menghapus akun Anda secara permanen?\nTindakan ini tidak dapat dibatalkan!", 
-                "Konfirmasi Hapus Akun", 
+                "Are you sure you want to delete your account permanently?\nThis action cannot be undone!", 
+                "Confirm Delete Account", 
                 JOptionPane.YES_NO_OPTION, 
                 JOptionPane.WARNING_MESSAGE);
 
@@ -270,7 +270,7 @@ public class DashboardPelanggan extends JPanel {
             boolean success = true; // Simulasi berhasil
 
             if (success) {
-                GUIHelper.showInfo(this, "Akun Anda telah berhasil dihapus.");
+                GUIHelper.showInfo(this, "Your account has been successfully deleted.");
                 UserSession.logout(); // Bersihkan data session login
                 
                 // Menutup window/frame saat ini dan kembali ke form login
@@ -281,9 +281,9 @@ public class DashboardPelanggan extends JPanel {
                 
                 // Buka kembali halaman Login (Sesuaikan nama class Frame Login milikmu)
                 // new LoginFrame().setVisible(true);
-                System.out.println("DEBUG: Akun terhapus, diarahkan kembali ke login screen.");
+                System.out.println("DEBUG: Your Account has been deleted, redirected to login screen.");
             } else {
-                GUIHelper.showError(this, "Gagal menghapus akun dari database.");
+                GUIHelper.showError(this, "Failed to delete account from database.");
             }
         }
     }
