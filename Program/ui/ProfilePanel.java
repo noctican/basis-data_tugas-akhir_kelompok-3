@@ -5,56 +5,257 @@ import helpers.GUIHelper;
 import models.UserModel;
 import session.UserSession;
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
 public class ProfilePanel extends JPanel {
     private UserModel userModel;
+    
+    // Identity fields
+    private JTextField txtNamaDepan;
+    private JTextField txtNamaBelakang;
+    private JTextField txtEmail; 
+    private JPasswordField txtPassword;
+    private JTextField txtJenisMember;     
+    private JTextField txtPoin;    
+    private JTextField txtTanggalGabung;   
+    private JButton btnAction; 
+    private JButton btnBatal;  
+    private JButton btnHapusAkun; 
+    private boolean isEditMode = false;
+
+    // Customer Specific fields
     private JTable alamatTable, topupTable;
     private DefaultTableModel alamatModel, topupModel;
-    private JLabel nameL, emailL, phoneL, walletL;
 
     public ProfilePanel() {
         userModel = new UserModel();
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-        setupProfileInfo();
         
+        setupIdentityPanel();
+        loadUserData();
+        setFieldsEditable(false);
+
         if (UserSession.getRole() == UserSession.Role.PELANGGAN) {
             setupCustomerSpecifics();
         }
     }
 
-    private void setupProfileInfo() {
-        JPanel infoPanel = new JPanel(new GridBagLayout());
-        infoPanel.setBorder(BorderFactory.createTitledBorder("My Profile"));
+    private void setupIdentityPanel() {
+        JPanel identityPanel = new JPanel(new GridBagLayout());
+        identityPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createEtchedBorder(), "Identity Information", 
+                TitledBorder.LEFT, TitledBorder.TOP, new Font("Arial", Font.BOLD, 14)));
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(6, 8, 6, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        Pengguna u = UserSession.getCurrentUser();
-        nameL = new JLabel("Name: " + u.getFullName());
-        emailL = new JLabel("Email: " + u.getEmail());
-        phoneL = new JLabel("Phone: " + (u.getNomorTelepon() != null ? u.getNomorTelepon() : "-"));
-        
-        gbc.gridx = 0; gbc.gridy = 0; infoPanel.add(nameL, gbc);
-        gbc.gridx = 0; gbc.gridy = 1; infoPanel.add(emailL, gbc);
-        gbc.gridx = 0; gbc.gridy = 2; infoPanel.add(phoneL, gbc);
+        // 1. Nama Depan
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.0;
+        identityPanel.add(new JLabel("First Name:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0;
+        txtNamaDepan = new JTextField(20);
+        identityPanel.add(txtNamaDepan, gbc);
 
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton editBtn = new JButton("Edit Profile");
-        JButton passBtn = new JButton("Edit Password");
-        
-        editBtn.addActionListener(e -> showEditProfileDialog());
-        passBtn.addActionListener(e -> showChangePasswordDialog());
-        
-        btnPanel.add(editBtn);
-        btnPanel.add(passBtn);
-        gbc.gridx = 0; gbc.gridy = 3; infoPanel.add(btnPanel, gbc);
+        // 2. Nama Belakang
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.0;
+        identityPanel.add(new JLabel("Last Name:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0;
+        txtNamaBelakang = new JTextField(20);
+        identityPanel.add(txtNamaBelakang, gbc);
 
-        add(infoPanel, BorderLayout.NORTH);
+        // 3. Email
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0.0;
+        identityPanel.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0;
+        txtEmail = new JTextField(20);
+        identityPanel.add(txtEmail, gbc);
+
+        // 4. Password
+        gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0.0;
+        identityPanel.add(new JLabel("Password:"), gbc);
+        gbc.gridx = 1; gbc.weightx = 1.0;
+        txtPassword = new JPasswordField(20);
+        txtPassword.setEchoChar('*');
+        identityPanel.add(txtPassword, gbc);
+
+        int currentY = 4;
+
+        if (UserSession.getRole() == UserSession.Role.PELANGGAN) {
+            // 5. Jenis Member (Read-Only)
+            gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
+            identityPanel.add(new JLabel("Membership Type:"), gbc);
+            gbc.gridx = 1; gbc.weightx = 1.0;
+            txtJenisMember = new JTextField(20);
+            txtJenisMember.setEditable(false);
+            txtJenisMember.setBackground(new Color(240, 240, 240)); 
+            identityPanel.add(txtJenisMember, gbc);
+            currentY++;
+
+            // 6. Poin (Read-Only)
+            gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
+            identityPanel.add(new JLabel("Points:"), gbc);
+            gbc.gridx = 1; gbc.weightx = 1.0;
+            txtPoin = new JTextField(20);
+            txtPoin.setEditable(false);
+            txtPoin.setBackground(new Color(240, 240, 240));
+            identityPanel.add(txtPoin, gbc);
+            currentY++;
+
+            // 7. Tanggal Bergabung (Read-Only)
+            gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
+            identityPanel.add(new JLabel("Join Date:"), gbc);
+            gbc.gridx = 1; gbc.weightx = 1.0;
+            txtTanggalGabung = new JTextField(20);
+            txtTanggalGabung.setEditable(false);
+            txtTanggalGabung.setBackground(new Color(240, 240, 240));
+            identityPanel.add(txtTanggalGabung, gbc);
+            currentY++;
+        }
+
+        // Panel Khusus Tombol
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        
+        btnHapusAkun = new JButton("Delete Account");
+        btnHapusAkun.setBackground(new Color(220, 53, 69));
+        btnHapusAkun.setForeground(Color.WHITE);
+        btnHapusAkun.addActionListener(e -> handleHapusAkun());
+        buttonPanel.add(btnHapusAkun);
+
+        btnBatal = new JButton("Cancel");
+        btnBatal.setVisible(false); 
+        btnBatal.addActionListener(e -> handleCancel());
+        buttonPanel.add(btnBatal);
+
+        btnAction = new JButton("Edit Profile");
+        btnAction.addActionListener(e -> handleActionButton());
+        buttonPanel.add(btnAction);
+
+        gbc.gridx = 1; gbc.gridy = currentY; gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.EAST;
+        identityPanel.add(buttonPanel, gbc);
+
+        add(identityPanel, BorderLayout.NORTH);
+    }
+
+    private void loadUserData() {
+        Pengguna currentUser = UserSession.getCurrentUser();
+        if (currentUser != null) {
+            txtNamaDepan.setText(currentUser.getNamaDepan() != null ? currentUser.getNamaDepan() : "");
+            txtNamaBelakang.setText(currentUser.getNamaBelakang() != null ? currentUser.getNamaBelakang() : "");
+            txtEmail.setText(currentUser.getEmail() != null ? currentUser.getEmail() : "");
+            txtPassword.setText(currentUser.getPassword() != null ? currentUser.getPassword() : "");
+
+            if (UserSession.getRole() == UserSession.Role.PELANGGAN) {
+                Pelanggan pelanggan = userModel.getPelangganById(currentUser.getIdPengguna());
+                txtJenisMember.setText(pelanggan != null && pelanggan.getJenisMember() != null ? pelanggan.getJenisMember() : "Reguler");
+                txtPoin.setText(pelanggan != null ? String.valueOf(pelanggan.getPoin()) : "0");
+                txtTanggalGabung.setText(pelanggan != null && pelanggan.getTanggalBergabung() != null ? pelanggan.getTanggalBergabung().toString() : "-");
+            }
+        }
+    }
+
+    private void setFieldsEditable(boolean editable) {
+        txtNamaDepan.setEditable(editable);
+        txtNamaBelakang.setEditable(editable);
+        txtEmail.setEditable(editable);
+        txtPassword.setEditable(editable);
+        
+        Color bg = editable ? Color.WHITE : new Color(240, 240, 240);
+        txtNamaDepan.setBackground(bg);
+        txtNamaBelakang.setBackground(bg);
+        txtEmail.setBackground(bg);
+        txtPassword.setBackground(bg);
+    }
+
+    private void handleActionButton() {
+        if (!isEditMode) {
+            isEditMode = true;
+            setFieldsEditable(true);
+            btnAction.setText("Save Changes");
+            btnBatal.setVisible(true);
+            btnHapusAkun.setVisible(false);
+        } else {
+            String namaDepanBaru = txtNamaDepan.getText().trim();
+            String namaBelakangBaru = txtNamaBelakang.getText().trim();
+            String emailBaru = txtEmail.getText().trim();
+            String passwordBaru = new String(txtPassword.getPassword()).trim();
+
+            if (namaDepanBaru.isEmpty() || emailBaru.isEmpty() || passwordBaru.isEmpty()) {
+                GUIHelper.showError(this, "First Name, Email, and Password must be filled out!");
+                return;
+            }
+
+            Pengguna currentUser = UserSession.getCurrentUser();
+            if (currentUser != null) {
+                currentUser.setNamaDepan(namaDepanBaru);
+                currentUser.setNamaBelakang(namaBelakangBaru);
+                currentUser.setEmail(emailBaru);
+                currentUser.setPassword(passwordBaru);
+
+                // boolean success = userModel.updatePenggunaFull(currentUser);
+                boolean success = true;
+
+                if (success) {
+                    GUIHelper.showInfo(this, "Profile successfully updated!");
+                    isEditMode = false;
+                    setFieldsEditable(false);
+                    btnAction.setText("Edit Profil");
+                    btnBatal.setVisible(false);
+                    btnHapusAkun.setVisible(true);
+                } else {
+                    GUIHelper.showError(this, "Failed to update profile in database.");
+                }
+            }
+        }
+    }
+
+    private void handleCancel() {
+        loadUserData();
+        isEditMode = false;
+        setFieldsEditable(false);
+        btnAction.setText("Edit Profil");
+        btnBatal.setVisible(false);
+        btnHapusAkun.setVisible(true);
+    }
+
+    private void handleHapusAkun() {
+        Pengguna currentUser = UserSession.getCurrentUser();
+        if (currentUser == null) return;
+
+        int confirm = JOptionPane.showConfirmDialog(this, 
+                "Are you sure you want to delete your account permanently?\nThis action cannot be undone!", 
+                "Confirm Delete Account", 
+                JOptionPane.YES_NO_OPTION, 
+                JOptionPane.WARNING_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean success = false;
+            if (UserSession.getRole() == UserSession.Role.PELANGGAN) {
+                success = userModel.deleteCustomer(currentUser.getIdPengguna());
+            } else {
+                success = userModel.deleteEmployee(currentUser.getIdPengguna());
+            }
+
+            if (success) {
+                GUIHelper.showInfo(this, "Your account has been successfully deleted.");
+                UserSession.logout();
+                
+                Window ancestor = SwingUtilities.getWindowAncestor(this);
+                if (ancestor != null) {
+                    ancestor.dispose();
+                }
+                
+                new LoginFrame().setVisible(true);
+            } else {
+                GUIHelper.showError(this, "Failed to delete account from database.");
+            }
+        }
     }
 
     private void setupCustomerSpecifics() {
@@ -70,7 +271,7 @@ public class ProfilePanel extends JPanel {
         alamatTable = new JTable(alamatModel);
         aPanel.add(new JScrollPane(alamatTable), BorderLayout.CENTER);
         
-        JPanel addressBtnPanel = new JPanel(new BorderLayout());
+        JPanel addressBtnPanel = new JPanel(new GridLayout(1, 0));
         JButton addAddressBtn = new JButton("Add Address");
         addAddressBtn.addActionListener(e -> showAddressDialog(null, "", "", "", "", ""));
         JButton editAddressBtn = new JButton("Edit Address");
@@ -88,8 +289,11 @@ public class ProfilePanel extends JPanel {
             String phn = (String) alamatModel.getValueAt(row, 5);
             showAddressDialog(id, rec, str, cit, pro, phn);
         });
-        addressBtnPanel.add(addAddressBtn, BorderLayout.WEST);
-        addressBtnPanel.add(editAddressBtn, BorderLayout.EAST);
+        JButton deleteAddressBtn = new JButton("Delete Address");
+        deleteAddressBtn.addActionListener(e -> handleDeleteAlamat());
+        addressBtnPanel.add(addAddressBtn);
+        addressBtnPanel.add(editAddressBtn);
+        addressBtnPanel.add(deleteAddressBtn);
         aPanel.add(addressBtnPanel, BorderLayout.SOUTH);
 
         // Topups
@@ -126,94 +330,6 @@ public class ProfilePanel extends JPanel {
         for (RiwayatTopup r : list) topupModel.addRow(new Object[]{r.getTanggalTopup(), r.getNominal(), r.getStatus()});
     }
 
-    private void showEditProfileDialog() {
-        Pengguna u = UserSession.getCurrentUser();
-        JTextField fnameF = new JTextField(u.getNamaDepan());
-        JTextField lnameF = new JTextField(u.getNamaBelakang());
-        JTextField phoneF = new JTextField(u.getNomorTelepon());
-        
-        Object[] message = {"First Name:", fnameF, "Last Name:", lnameF, "Phone:", phoneF};
-        int option = JOptionPane.showConfirmDialog(this, message, "Update Profile", JOptionPane.OK_CANCEL_OPTION);
-        add(new JScrollPane(alamatTable), BorderLayout.CENTER);
-    }
-
-    private void setupBottomPanel() {
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        
-        JButton addBtn = new JButton("Add New Address");
-        addBtn.addActionListener(e -> showAddAlamatDialog());
-        
-        JButton editAlamatBtn = new JButton("Edit Selected Address");
-        editAlamatBtn.addActionListener(e -> handleEditAlamat());
-        
-        JButton deleteAlamatBtn = new JButton("Delete Selected Address");
-        deleteAlamatBtn.addActionListener(e -> handleDeleteAlamat());
-        
-        bottomPanel.add(addBtn);
-        bottomPanel.add(editAlamatBtn); 
-        bottomPanel.add(deleteAlamatBtn); 
-
-        add(bottomPanel, BorderLayout.SOUTH);
-    }
-
-    private void handleEditAlamat() {
-        int selectedRow = alamatTable.getSelectedRow();
-        if (selectedRow == -1) {
-            GUIHelper.showInfo(this, "Silakan pilih salah satu alamat di tabel terlebih dahulu!");
-            return;
-        }
-
-        int idAlamat = (int) alamatModel.getValueAt(selectedRow, 0);
-        String oldPenerima = (String) alamatModel.getValueAt(selectedRow, 1);
-        String oldJalan = (String) alamatModel.getValueAt(selectedRow, 2);
-        String oldKota = (String) alamatModel.getValueAt(selectedRow, 3);
-        String oldProvinsi = (String) alamatModel.getValueAt(selectedRow, 4);
-        String oldTelp = (String) alamatModel.getValueAt(selectedRow, 5);
-
-        JTextField recipientF = new JTextField(oldPenerima);
-        JTextField streetF = new JTextField(oldJalan);
-        JTextField cityF = new JTextField(oldKota);
-        JTextField provF = new JTextField(oldProvinsi);
-        JTextField phoneF = new JTextField(oldTelp);
-
-        Object[] message = {
-            "Recipient Name:", recipientF, 
-            "Street:", streetF, 
-            "City:", cityF, 
-            "Province:", provF, 
-            "Phone:", phoneF
-        };
-        
-        int option = JOptionPane.showConfirmDialog(this, message, "Edit Address", JOptionPane.OK_CANCEL_OPTION);
-        
-        if (option == JOptionPane.OK_OPTION) {
-            u.setNamaDepan(fnameF.getText());
-            u.setNamaBelakang(lnameF.getText());
-            u.setNomorTelepon(phoneF.getText());
-            if (userModel.updateProfile(u)) {
-                GUIHelper.showInfo(this, "Profile updated!");
-                nameL.setText("Name: " + u.getFullName());
-                phoneL.setText("Phone: " + u.getNomorTelepon());
-            }
-        }
-    }
-
-    private void showChangePasswordDialog() {
-        JPasswordField oldP = new JPasswordField();
-        JPasswordField newP = new JPasswordField();
-        JPasswordField confP = new JPasswordField();
-        
-        Object[] message = {"Old Password:", oldP, "New Password:", newP, "Confirm New Password:", confP};
-        int option = JOptionPane.showConfirmDialog(this, message, "Change Password", JOptionPane.OK_CANCEL_OPTION);
-        if (option == JOptionPane.OK_OPTION) {
-            String op = new String(oldP.getPassword());
-            String np = new String(newP.getPassword());
-            String cp = new String(confP.getPassword());
-            
-            if (!np.equals(cp)) { GUIHelper.showError(this, "Confirm password does not match!"); return; }
-            
-            if (userModel.updatePassword(UserSession.getCurrentUser().getIdPengguna(), op, np)) {
-                GUIHelper.showInfo(this, "Password updated!");
     private void handleDeleteAlamat() {
         int selectedRow = alamatTable.getSelectedRow();
         if (selectedRow == -1) {
@@ -232,9 +348,9 @@ public class ProfilePanel extends JPanel {
             boolean success = userModel.deleteAlamat(idAlamat);
             if (success) {
                 JOptionPane.showMessageDialog(this, "Alamat berhasil dihapus!");
-                refreshAlamat(); // Reload tabel otomatis
+                refreshAlamat();
             } else {
-                GUIHelper.showError(this, "Failed to update password. Check your old password.");
+                GUIHelper.showError(this, "Failed to delete address.");
             }
         }
     }
@@ -263,27 +379,17 @@ public class ProfilePanel extends JPanel {
         int option = JOptionPane.showConfirmDialog(this, message, (idAlamat == null ? "Add" : "Edit") + " Address", JOptionPane.OK_CANCEL_OPTION);
         
         if (option == JOptionPane.OK_OPTION) {
+            if (recipientF.getText().trim().isEmpty() || streetF.getText().trim().isEmpty()) {
+                GUIHelper.showInfo(this, "Nama Penerima dan Jalan tidak boleh kosong!");
+                return;
+            }
+
             boolean success;
             if (idAlamat == null) {
                 success = userModel.addAlamat(UserSession.getCurrentUser().getIdPengguna(), provF.getText(), cityF.getText(), streetF.getText(), recipientF.getText(), phoneF.getText());
             } else {
                 success = userModel.updateAlamat(idAlamat, provF.getText(), cityF.getText(), streetF.getText(), recipientF.getText(), phoneF.getText());
             }
-            if (recipientF.getText().trim().isEmpty() || streetF.getText().trim().isEmpty()) {
-                GUIHelper.showInfo(this, "Nama Penerima dan Jalan tidak boleh kosong!");
-                return;
-            }
-
-            int idPenggunaLogin = UserSession.getCurrentUser().getIdPengguna();
-            
-            boolean success = userModel.addAlamat(
-                idPenggunaLogin, 
-                provF.getText(), 
-                cityF.getText(), 
-                streetF.getText(), 
-                recipientF.getText(), 
-                phoneF.getText()
-            );
             
             if (success) {
                 GUIHelper.showInfo(this, "Address saved successfully!");
