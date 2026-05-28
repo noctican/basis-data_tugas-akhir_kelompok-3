@@ -1,37 +1,69 @@
 package models;
 
 import config.DatabaseConfig;
-import entities.*;
 import helpers.DBHelper;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReturnModel {
-    public boolean createReturn(int idTransaksi, int idProduk, String sku, int qty, String alasan) {
+    public List<Object[]> getAllPendingReturns() {
+        List<Object[]> list = new ArrayList<>();
+        String sql = "SELECT r.id_retur, r.id_transaksi, dr.id_produk, dr.sku, dr.kuantitas, dr.alasan " +
+                     "FROM retur r JOIN detail_retur dr ON r.id_retur = dr.id_retur " +
+                     "WHERE r.status = 'PENDING'";
+                     
+        try (Connection conn = DatabaseConfig.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getInt("id_retur"), 
+                    rs.getInt("id_transaksi"), 
+                    rs.getInt("id_produk"), 
+                    rs.getString("sku"), 
+                    rs.getInt("kuantitas"), 
+                    rs.getString("alasan")
+                });
+            }
+        } catch (SQLException e) { 
+            e.printStackTrace(); 
+        }
+        return list;
+    }
+
+    public boolean approveReturn(int idRetur) {
+        String sql = "UPDATE retur SET status = 'APPROVED' WHERE id_retur = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idRetur);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteReturn(int idRetur) {
         Connection conn = null;
         try {
             conn = DatabaseConfig.getConnection();
             conn.setAutoCommit(false);
 
-            int idRetur = -1;
-            String sqlR = "INSERT INTO retur (id_transaksi, status) VALUES (?, 'PENDING')";
-            try (PreparedStatement pstmt = conn.prepareStatement(sqlR, Statement.RETURN_GENERATED_KEYS)) {
-                pstmt.setInt(1, idTransaksi);
+            // 1. Hapus detail_retur (Anak tabel)
+            String sqlDetail = "DELETE FROM detail_retur WHERE id_retur = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlDetail)) {
+                pstmt.setInt(1, idRetur);
                 pstmt.executeUpdate();
-                try (ResultSet rs = pstmt.getGeneratedKeys()) {
-                    if (rs.next()) idRetur = rs.getInt(1);
-                }
             }
 
-            String sqlDR = "INSERT INTO detail_retur (id_transaksi, id_retur, id_produk, sku, kuantitas, alasan) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement pstmt = conn.prepareStatement(sqlDR)) {
-                pstmt.setInt(1, idTransaksi);
-                pstmt.setInt(2, idRetur);
-                pstmt.setInt(3, idProduk);
-                pstmt.setString(4, sku);
-                pstmt.setInt(5, qty);
-                pstmt.setString(6, alasan);
+            // 2. Hapus data utama di tabel retur (Induk tabel)
+            String sqlMain = "DELETE FROM retur WHERE id_retur = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlMain)) {
+                pstmt.setInt(1, idRetur);
                 pstmt.executeUpdate();
             }
 
@@ -42,22 +74,10 @@ public class ReturnModel {
             e.printStackTrace();
             return false;
         } finally {
-            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
-        }
-    }
-
-    public List<Object[]> getAllPendingReturns() {
-        List<Object[]> list = new ArrayList<>();
-        String sql = "SELECT r.id_retur, r.id_transaksi, dr.id_produk, dr.sku, dr.kuantitas, dr.alasan " +
-                     "FROM retur r JOIN detail_retur dr ON r.id_retur = dr.id_retur " +
-                     "WHERE r.status = 'PENDING'";
-        try (Connection conn = DatabaseConfig.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                list.add(new Object[]{rs.getInt("id_retur"), rs.getInt("id_transaksi"), rs.getInt("id_produk"), rs.getString("sku"), rs.getInt("kuantitas"), rs.getString("alasan")});
+            if (conn != null) {
+                try { conn.setAutoCommit(true); } catch (SQLException ex) {}
+                try { conn.close(); } catch (SQLException ex) {}
             }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return list;
+        }
     }
 }
