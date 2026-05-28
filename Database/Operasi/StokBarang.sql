@@ -31,7 +31,6 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        -- 1. Buat transaksi dengan status awal PENDING
         INSERT INTO transaksi (tanggal_transaksi, total_pembelian, status_pembayaran, metode_pembayaran)
         VALUES (GETDATE(), @total_pembelian, 'PENDING', @metode_pembayaran);
         
@@ -55,7 +54,7 @@ BEGIN
         DELETE FROM detail_keranjang WHERE id_keranjang = @id_keranjang;
 
         COMMIT TRANSACTION;
-        PRINT 'Procedure 1 Selesai: Keranjang dihapus, stok direservasi. ID Transaksi: ' + CAST(@id_transaksi_baru AS VARCHAR(10));
+        PRINT 'Keranjang dihapus, stok direservasi. ID Transaksi: ' + CAST(@id_transaksi_baru AS VARCHAR(10));
         
     END TRY
     BEGIN CATCH

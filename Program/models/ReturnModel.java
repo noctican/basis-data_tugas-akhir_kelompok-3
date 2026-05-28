@@ -7,30 +7,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReturnModel {
-    public List<Object[]> getAllPendingReturns() {
+    public List<Object[]> getReturnsByStatus(String status) {
         List<Object[]> list = new ArrayList<>();
-        String sql = "SELECT r.id_retur, r.id_transaksi, dr.id_produk, dr.sku, dr.kuantitas, dr.alasan " +
-                     "FROM retur r JOIN detail_retur dr ON r.id_retur = dr.id_retur " +
-                     "WHERE r.status = 'PENDING'";
-                     
+        // Query SQL menggunakan placeholder '?' untuk menyaring berdasarkan status dari dropdown UI
+        String query = "SELECT r.id_retur, r.id_transaksi, dr.id_produk, dr.sku, dr.kuantitas, dr.alasan " +
+                    "FROM retur r " +
+                    "JOIN detail_retur dr ON r.id_retur = dr.id_retur " +
+                    "WHERE r.status = ?";
+        
         try (Connection conn = DatabaseConfig.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setString(1, status);
+            ResultSet rs = ps.executeQuery();
+            
             while (rs.next()) {
                 list.add(new Object[]{
-                    rs.getInt("id_retur"), 
-                    rs.getInt("id_transaksi"), 
-                    rs.getInt("id_produk"), 
-                    rs.getString("sku"), 
-                    rs.getInt("kuantitas"), 
+                    rs.getInt("id_retur"),
+                    rs.getInt("id_transaksi"),
+                    rs.getInt("id_produk"),
+                    rs.getString("sku"),
+                    rs.getInt("kuantitas"),
                     rs.getString("alasan")
                 });
             }
-        } catch (SQLException e) { 
-            e.printStackTrace(); 
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return list;
-    }
+}
+
+
 
     public boolean approveReturn(int idRetur) {
         String sql = "UPDATE retur SET status = 'APPROVED' WHERE id_retur = ?";
@@ -78,6 +85,21 @@ public class ReturnModel {
                 try { conn.setAutoCommit(true); } catch (SQLException ex) {}
                 try { conn.close(); } catch (SQLException ex) {}
             }
+        }
+    }
+    
+    public boolean rejectReturn(int idRetur) {
+        String sql = "UPDATE retur SET status = 'REJECTED' WHERE id_retur = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, idRetur);
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
