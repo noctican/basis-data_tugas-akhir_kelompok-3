@@ -21,4 +21,16 @@ public class NumberHelper {
 
         return formatter.format(angka);
     }
+
+    public static String formatNumber(double angka) {
+        Locale localeID = Locale.of("id", "ID");
+        NumberFormat formatter;
+
+        formatter = NumberFormat.getCurrencyInstance(localeID);
+
+        formatter.setMinimumFractionDigits(0);
+        formatter.setMaximumFractionDigits(2);
+
+        return formatter.format(angka);
+    }
 }
