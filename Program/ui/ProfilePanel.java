@@ -134,6 +134,58 @@ public class ProfilePanel extends JPanel {
         
         Object[] message = {"First Name:", fnameF, "Last Name:", lnameF, "Phone:", phoneF};
         int option = JOptionPane.showConfirmDialog(this, message, "Update Profile", JOptionPane.OK_CANCEL_OPTION);
+        add(new JScrollPane(alamatTable), BorderLayout.CENTER);
+    }
+
+    private void setupBottomPanel() {
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        
+        JButton addBtn = new JButton("Add New Address");
+        addBtn.addActionListener(e -> showAddAlamatDialog());
+        
+        JButton editAlamatBtn = new JButton("Edit Selected Address");
+        editAlamatBtn.addActionListener(e -> handleEditAlamat());
+        
+        JButton deleteAlamatBtn = new JButton("Delete Selected Address");
+        deleteAlamatBtn.addActionListener(e -> handleDeleteAlamat());
+        
+        bottomPanel.add(addBtn);
+        bottomPanel.add(editAlamatBtn); 
+        bottomPanel.add(deleteAlamatBtn); 
+
+        add(bottomPanel, BorderLayout.SOUTH);
+    }
+
+    private void handleEditAlamat() {
+        int selectedRow = alamatTable.getSelectedRow();
+        if (selectedRow == -1) {
+            GUIHelper.showInfo(this, "Silakan pilih salah satu alamat di tabel terlebih dahulu!");
+            return;
+        }
+
+        int idAlamat = (int) alamatModel.getValueAt(selectedRow, 0);
+        String oldPenerima = (String) alamatModel.getValueAt(selectedRow, 1);
+        String oldJalan = (String) alamatModel.getValueAt(selectedRow, 2);
+        String oldKota = (String) alamatModel.getValueAt(selectedRow, 3);
+        String oldProvinsi = (String) alamatModel.getValueAt(selectedRow, 4);
+        String oldTelp = (String) alamatModel.getValueAt(selectedRow, 5);
+
+        JTextField recipientF = new JTextField(oldPenerima);
+        JTextField streetF = new JTextField(oldJalan);
+        JTextField cityF = new JTextField(oldKota);
+        JTextField provF = new JTextField(oldProvinsi);
+        JTextField phoneF = new JTextField(oldTelp);
+
+        Object[] message = {
+            "Recipient Name:", recipientF, 
+            "Street:", streetF, 
+            "City:", cityF, 
+            "Province:", provF, 
+            "Phone:", phoneF
+        };
+        
+        int option = JOptionPane.showConfirmDialog(this, message, "Edit Address", JOptionPane.OK_CANCEL_OPTION);
+        
         if (option == JOptionPane.OK_OPTION) {
             u.setNamaDepan(fnameF.getText());
             u.setNamaBelakang(lnameF.getText());
@@ -162,6 +214,25 @@ public class ProfilePanel extends JPanel {
             
             if (userModel.updatePassword(UserSession.getCurrentUser().getIdPengguna(), op, np)) {
                 GUIHelper.showInfo(this, "Password updated!");
+    private void handleDeleteAlamat() {
+        int selectedRow = alamatTable.getSelectedRow();
+        if (selectedRow == -1) {
+            GUIHelper.showInfo(this, "Silakan pilih salah satu alamat di tabel yang ingin dihapus!");
+            return;
+        }
+
+        int idAlamat = (int) alamatModel.getValueAt(selectedRow, 0);
+        String namaPenerima = (String) alamatModel.getValueAt(selectedRow, 1);
+
+        int konfirmasi = JOptionPane.showConfirmDialog(this, 
+                "Apakah Anda yakin ingin menghapus alamat atas nama " + namaPenerima + "?", 
+                "Konfirmasi Hapus", JOptionPane.YES_NO_OPTION);
+
+        if (konfirmasi == JOptionPane.YES_OPTION) {
+            boolean success = userModel.deleteAlamat(idAlamat);
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Alamat berhasil dihapus!");
+                refreshAlamat(); // Reload tabel otomatis
             } else {
                 GUIHelper.showError(this, "Failed to update password. Check your old password.");
             }
@@ -198,6 +269,21 @@ public class ProfilePanel extends JPanel {
             } else {
                 success = userModel.updateAlamat(idAlamat, provF.getText(), cityF.getText(), streetF.getText(), recipientF.getText(), phoneF.getText());
             }
+            if (recipientF.getText().trim().isEmpty() || streetF.getText().trim().isEmpty()) {
+                GUIHelper.showInfo(this, "Nama Penerima dan Jalan tidak boleh kosong!");
+                return;
+            }
+
+            int idPenggunaLogin = UserSession.getCurrentUser().getIdPengguna();
+            
+            boolean success = userModel.addAlamat(
+                idPenggunaLogin, 
+                provF.getText(), 
+                cityF.getText(), 
+                streetF.getText(), 
+                recipientF.getText(), 
+                phoneF.getText()
+            );
             
             if (success) {
                 GUIHelper.showInfo(this, "Address saved successfully!");

@@ -3,7 +3,7 @@ package entities;
 import java.sql.Date;
 import java.math.BigDecimal;
 
-public class Pelanggan {
+public class Pelanggan extends Pengguna {
     private int idPengguna;
     private String jenisMember;
     private Date tanggalBergabung;

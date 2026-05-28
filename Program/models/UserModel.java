@@ -106,6 +106,27 @@ public class UserModel {
         return null;    
     }
 
+    public Pelanggan getPelangganById(int idPengguna) {
+        String sql = "SELECT * FROM pelanggan WHERE id_pengguna = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idPengguna);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Pelanggan p = new Pelanggan();
+                    p.setIdPengguna(idPengguna);
+                    p.setJenisMember(rs.getString("jenis_member"));
+                    p.setTanggalBergabung(rs.getDate("tanggal_bergabung"));
+                    p.setPoin(rs.getInt("poin"));
+                    p.setUsedVoucherPercentage(rs.getBoolean("is_used_voucher_percentage"));
+                    p.setUsedVoucherPrice(rs.getBoolean("is_used_voucher_price"));
+                    return p;
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
     public List<Karyawan> getKaryawanByDepartemen(int idDepartemen) {
         List<Karyawan> list = new ArrayList<>();
         String sql = "SELECT * FROM karyawan WHERE id_departemen = ?";
