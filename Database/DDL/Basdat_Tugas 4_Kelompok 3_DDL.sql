@@ -105,6 +105,16 @@ CREATE TABLE pelanggan (
 );
 GO
 
+CREATE TABLE riwayat_topup (
+	id_pengguna INT NOT NULL,
+	id_topup INT IDENTITY(1, 1) NOT NULL,
+	tanggal_topup DATETIME DEFAULT(GETDATE()),
+	nominal DECIMAL(19, 4) DEFAULT(0),
+	status VARCHAR(50) DEFAULT('PENDING'), -- PENDING, SUCCESS, FAILED
+	PRIMARY KEY (id_pengguna, id_topup),
+	CONSTRAINT fk_pelanggan_topup FOREIGN KEY (id_pengguna) REFERENCES pelanggan(id_pengguna),
+);
+
 CREATE TABLE alamat_pelanggan (
 	id_pengguna INT NOT NULL,
 	id_alamat INT IDENTITY(1, 1) NOT NULL,

@@ -462,17 +462,92 @@ public class UserModel {
     public boolean addAlamat(int idPengguna, String provinsi, String kota, String jalan, String namaPenerima, String noTelp) {
         String sql = "INSERT INTO alamat_pelanggan (id_pengguna, provinsi, kota, jalan, nama_penerima, no_telp) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, idPengguna);
-        ps.setString(2, provinsi);
-        ps.setString(3, kota);
-        ps.setString(4, jalan);
-        ps.setString(5, namaPenerima);
-        ps.setString(6, noTelp);
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idPengguna);
+            ps.setString(2, provinsi);
+            ps.setString(3, kota);
+            ps.setString(4, jalan);
+            ps.setString(5, namaPenerima);
+            ps.setString(6, noTelp);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
+
+    public boolean updateProfile(Pengguna p) {
+        String sql = "UPDATE pengguna SET nama_depan = ?, nama_belakang = ?, nomor_telepon = ? WHERE id_pengguna = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, p.getNamaDepan());
+            pstmt.setString(2, p.getNamaBelakang());
+            pstmt.setString(3, p.getNomorTelepon());
+            pstmt.setInt(4, p.getIdPengguna());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public boolean updatePassword(int idPengguna, String oldPass, String newPass) {
+        String sql = "UPDATE pengguna SET password = ? WHERE id_pengguna = ? AND password = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newPass);
+            pstmt.setInt(2, idPengguna);
+            pstmt.setString(3, oldPass);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public List<RiwayatTopup> getTopupHistory(int idCustomer) {
+        List<RiwayatTopup> list = new ArrayList<>();
+        String sql = "SELECT * FROM riwayat_topup WHERE id_pengguna = ? ORDER BY tanggal_topup DESC";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idCustomer);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    RiwayatTopup r = new RiwayatTopup();
+                    r.setIdPengguna(rs.getInt("id_pengguna"));
+                    r.setIdTopup(rs.getInt("id_topup"));
+                    r.setTanggalTopup(rs.getTimestamp("tanggal_topup"));
+                    r.setNominal(rs.getBigDecimal("nominal"));
+                    r.setStatus(rs.getString("status"));
+                    list.add(r);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean addTopup(int idCustomer, java.math.BigDecimal nominal) {
+        Connection conn = null;
+        try {
+            conn = DatabaseConfig.getConnection();
+            conn.setAutoCommit(false);
+
+            String sqlRT = "INSERT INTO riwayat_topup (id_pengguna, nominal, status) VALUES (?, ?, 'SUCCESS')";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlRT)) {
+                pstmt.setInt(1, idCustomer);
+                pstmt.setBigDecimal(2, nominal);
+                pstmt.executeUpdate();
+            }
+
+            String sqlW = "UPDATE pelanggan SET wallet = ISNULL(wallet, 0) + ? WHERE id_pengguna = ?";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlW)) {
+                pstmt.setBigDecimal(1, nominal);
+                pstmt.setInt(2, idCustomer);
+                pstmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            DBHelper.rollback(conn);
+            e.printStackTrace();
+            return false;
+        } finally {
+            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+        }
+    }
 }

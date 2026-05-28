@@ -65,15 +65,17 @@ public class MainFrame extends JFrame {
         addNavButton("Inventory (Catalog)", "CATALOG");
         addNavButton("Human Resources", "HR");
         addNavButton("Customers & Members", "CUSTOMERS");
-        addNavButton("Orders Management", "ORDERS_ADMIN");
+        addNavButton("Order Management", "ORDERS_ADMIN");
+        addNavButton("Global Transactions", "ALL_TRANS");
         addNavButton("Returns & Returs", "RETURNS_ADMIN");
+        addNavButton("My Profile", "PROFILE");
     }
 
     private void setupCustomerSidebar() {
         addNavButton("Shop Products", "SHOP");
         addNavButton("My Cart", "CART");
         addNavButton("My Orders", "MY_ORDERS");
-        addNavButton("My Profile & Addresses", "PROFILE");
+        addNavButton("My Profile", "PROFILE");
         addNavButton("Returns & Help", "MY_RETURNS");
     }
 
@@ -105,7 +107,9 @@ public class MainFrame extends JFrame {
             contentArea.add(new HRPanel(this.loggedInUserId), "HR");
             contentArea.add(new CustomerPanel(), "CUSTOMERS");
             contentArea.add(new OrderAdminPanel(), "ORDERS_ADMIN");
+            contentArea.add(new AllTransactionsPanel(), "ALL_TRANS");
             contentArea.add(new ReturnAdminPanel(), "RETURNS_ADMIN");
+            contentArea.add(new ProfilePanel(), "PROFILE");
         } else {
             contentArea.add(new ShopPanel(), "SHOP");
             contentArea.add(new CartPanel(), "CART");
