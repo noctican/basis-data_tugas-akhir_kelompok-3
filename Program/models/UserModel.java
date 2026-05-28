@@ -124,6 +124,7 @@ public class UserModel {
                     p.setPoin(rs.getInt("poin"));
                     p.setUsedVoucherPercentage(rs.getBoolean("is_used_voucher_percentage"));
                     p.setUsedVoucherPrice(rs.getBoolean("is_used_voucher_price"));
+                    p.setWallet(rs.getBigDecimal("wallet"));
                     return p;
                 }
             }

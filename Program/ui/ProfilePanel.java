@@ -18,6 +18,7 @@ public class ProfilePanel extends JPanel {
     private JTextField txtNamaDepan;
     private JTextField txtNamaBelakang;
     private JTextField txtEmail; 
+    private JTextField txtWallet;
     private JPasswordField txtPassword;
     private JTextField txtJenisMember;     
     private JTextField txtPoin;    
@@ -97,6 +98,15 @@ public class ProfilePanel extends JPanel {
             identityPanel.add(txtJenisMember, gbc);
             currentY++;
 
+            gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
+            identityPanel.add(new JLabel("Wallet:"), gbc);
+            gbc.gridx = 1; gbc.weightx = 1.0;
+            txtWallet = new JTextField(20);
+            txtWallet.setEditable(false);
+            txtWallet.setBackground(new Color(240, 240, 240));
+            identityPanel.add(txtWallet, gbc);
+            currentY++;
+
             // 6. Poin (Read-Only)
             gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
             identityPanel.add(new JLabel("Points:"), gbc);
@@ -155,6 +165,7 @@ public class ProfilePanel extends JPanel {
             if (UserSession.getRole() == UserSession.Role.PELANGGAN) {
                 Pelanggan pelanggan = userModel.getPelangganById(currentUser.getIdPengguna());
                 txtJenisMember.setText(pelanggan != null && pelanggan.getJenisMember() != null ? pelanggan.getJenisMember() : "Reguler");
+                txtWallet.setText(pelanggan != null ? String.valueOf(pelanggan.getWallet()) : "0");
                 txtPoin.setText(pelanggan != null ? String.valueOf(pelanggan.getPoin()) : "0");
                 txtTanggalGabung.setText(pelanggan != null && pelanggan.getTanggalBergabung() != null ? pelanggan.getTanggalBergabung().toString() : "-");
             }

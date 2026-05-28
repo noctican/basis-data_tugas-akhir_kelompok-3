@@ -25,7 +25,7 @@ public class AuthModel {
                         rs.getString("password")
                     );
                     
-                    UserSession.Role role = determineRole(user.getIdPengguna());
+                    UserSession.Role role = determineRole(user);
                     if (role != null) {
                         UserSession.login(user, role);
                         return true;
@@ -38,11 +38,11 @@ public class AuthModel {
         return false;
     }
 
-    private UserSession.Role determineRole(int idPengguna) {
+    private UserSession.Role determineRole(Pengguna user) {
         String queryKaryawan = "SELECT 1 FROM karyawan WHERE id_pengguna = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(queryKaryawan)) {
-            stmt.setInt(1, idPengguna);
+            stmt.setInt(1, user.getIdPengguna());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return UserSession.Role.KARYAWAN;
             }
@@ -53,9 +53,10 @@ public class AuthModel {
         String queryPelanggan = "SELECT 1 FROM pelanggan WHERE id_pengguna = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(queryPelanggan)) {
-            stmt.setInt(1, idPengguna);
+            stmt.setInt(1, user.getIdPengguna());
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return UserSession.Role.PELANGGAN;
+                if (rs.next()) {
+                    return UserSession.Role.PELANGGAN;
             }
         } catch (SQLException e) {
             e.printStackTrace();
