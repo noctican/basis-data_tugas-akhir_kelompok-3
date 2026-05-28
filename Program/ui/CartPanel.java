@@ -140,7 +140,7 @@ public class CartPanel extends JPanel {
     private void handleCheckout() {
         if (cartModel.getRowCount() == 0) { GUIHelper.showError(this, "Cart is empty!"); return; }
 
-        String[] methods = {"Credit Card", "Bank Transfer", "E-Wallet", "COD"};
+        String[] methods = {"Wallet"};
         String selectedMethod = (String) JOptionPane.showInputDialog(this, "Select Payment Method:", "Checkout", JOptionPane.QUESTION_MESSAGE, null, methods, methods[0]);
         
         if (selectedMethod != null) {
