@@ -272,4 +272,65 @@ public class TransactionModel {
             return "ERROR: " + e.getMessage();
         }
     }
+
+    public List<Object[]> getTransactionsByUser(int idPengguna) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT t.id_transaksi, t.tanggal_transaksi, t.total_pembelian, " +
+                    "t.status_pembayaran, t.metode_pembayaran " +
+                    "FROM transaksi t " +
+                    "JOIN pelanggan_transaksi pt ON t.id_transaksi = pt.id_transaksi " +
+                    "WHERE pt.id_pengguna = ? " +
+                    "ORDER BY t.tanggal_transaksi DESC";
+                    
+        try (Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, idPengguna);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getInt("id_transaksi"),
+                    rs.getDate("tanggal_transaksi"),
+                    rs.getBigDecimal("total_pembelian"),
+                    rs.getString("status_pembayaran"),
+                    rs.getString("metode_pembayaran")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Object[]> getTransactionDetails(int idTransaksi) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT id_produk, sku, harga_pembelian, kuantitas " +
+                    "FROM detail_transaksi " +
+                    "WHERE id_transaksi = ?";
+                    
+        try (Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, idTransaksi);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                java.math.BigDecimal harga = rs.getBigDecimal("harga_pembelian");
+                int qty = rs.getInt("kuantitas");
+                java.math.BigDecimal subtotal = harga.multiply(new java.math.BigDecimal(qty));
+                
+                list.add(new Object[]{
+                    rs.getInt("id_produk"),
+                    rs.getString("sku"),
+                    harga,
+                    qty,
+                    subtotal
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

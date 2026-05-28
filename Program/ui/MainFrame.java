@@ -115,7 +115,7 @@ public class MainFrame extends JFrame {
         } else {
             contentArea.add(new ShopPanel(), "SHOP");
             contentArea.add(new CartPanel(), "CART");
-            contentArea.add(createPlaceholder("Your Order History"), "MY_ORDERS");
+            contentArea.add(new OrderPanel(), "MY_ORDERS");
             contentArea.add(new ProfilePanel(), "PROFILE");
             contentArea.add(createPlaceholder("Initiate Returns / Help"), "MY_RETURNS");
         }

@@ -26,14 +26,14 @@ BEGIN
 
     IF @status IS NULL
     BEGIN
-        SET @hasil_pesan = 'ERROR: Transaksi tidak ditemukan atau bukan milik pengguna ini.';
+        SET @hasil_pesan = 'ERROR: Transaction does not exist or is not owned by this user.';
         RETURN;
     END
 
     -- 2. Harus PENDING
     IF @status <> 'PENDING'
     BEGIN
-        SET @hasil_pesan = 'ERROR: Pembayaran tidak dapat diproses. Status transaksi saat ini adalah ' + @status + '.';
+        SET @hasil_pesan = 'ERROR: Payment cannot be processed. Current transaction status is ' + @status + '.';
         RETURN;
     END
 
@@ -44,7 +44,7 @@ BEGIN
         -- Auto-expire: panggil SP gagalkan supaya stok kembali juga
         DECLARE @pesan_expire NVARCHAR(255);
         EXEC sp_GagalkanPembayaran @id_transaksi, @pesan_expire OUTPUT;
-        SET @hasil_pesan = 'ERROR: Waktu pembayaran sudah habis (> 10 menit). Transaksi otomatis dibatalkan dan stok dikembalikan.';
+        SET @hasil_pesan = 'ERROR: Payment time has expired (> 10 minutes). Transaction automatically cancelled and stock returned.';
         RETURN;
     END
 
@@ -52,14 +52,14 @@ BEGIN
 
     IF @wallet IS NULL
     BEGIN
-        SET @hasil_pesan = 'ERROR: Data pelanggan tidak ditemukan.';
+        SET @hasil_pesan = 'ERROR: Customer data not found.';
         RETURN;
     END
 
     IF @wallet < @total
     BEGIN
-        SET @hasil_pesan = 'ERROR: Saldo wallet tidak mencukupi. Saldo Anda: Rp ' +
-                           FORMAT(@wallet, 'N2') + ', Total tagihan: Rp ' + FORMAT(@total, 'N2') + '.';
+        SET @hasil_pesan = 'ERROR: Wallet balance is insufficient. Your balance: Rp ' +
+                           FORMAT(@wallet, 'N2') + ', Total bill: Rp ' + FORMAT(@total, 'N2') + '.';
         RETURN;
     END
 
@@ -75,7 +75,7 @@ BEGIN
         WHERE  id_transaksi = @id_transaksi;
 
         COMMIT TRANSACTION;
-        SET @hasil_pesan = 'SUKSES: Pembayaran berhasil! Sisa saldo wallet: Rp ' +
+        SET @hasil_pesan = 'SUCCESS: Payment successful! Remaining wallet balance: Rp ' +
                            FORMAT(@wallet - @total, 'N2') + '.';
     END TRY
     BEGIN CATCH
@@ -100,13 +100,13 @@ BEGIN
 
     IF @status IS NULL
     BEGIN
-        SET @hasil_pesan = 'ERROR: Transaksi tidak ditemukan.';
+        SET @hasil_pesan = 'ERROR: Transaction does not exist.';
         RETURN;
     END
 
     IF @status NOT IN ('PENDING')
     BEGIN
-        SET @hasil_pesan = 'ERROR: Hanya transaksi PENDING yang dapat dibatalkan. Status saat ini: ' + @status + '.';
+        SET @hasil_pesan = 'ERROR: Only PENDING transactions can be cancelled. Current status: ' + @status + '.';
         RETURN;
     END
 
@@ -126,8 +126,8 @@ BEGIN
         WHERE  id_transaksi = @id_transaksi;
 
         COMMIT TRANSACTION;
-        SET @hasil_pesan = 'SUKSES: Transaksi #' + CAST(@id_transaksi AS VARCHAR) +
-                           ' telah dibatalkan dan stok produk sudah dikembalikan.';
+        SET @hasil_pesan = 'SUCCESS: Transaction #' + CAST(@id_transaksi AS VARCHAR) +
+                           ' has been cancelled and product stock has been returned.';
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
@@ -154,7 +154,7 @@ BEGIN
 
     IF NOT EXISTS (SELECT 1 FROM @expired)
     BEGIN
-        PRINT 'Tidak ada transaksi PENDING yang expired.';
+        PRINT 'There are no PENDING transactions that have expired.';
         RETURN;
     END
 
@@ -175,7 +175,7 @@ BEGIN
 
         COMMIT TRANSACTION;
         PRINT 'sp_CekExpiredPembayaran: ' + CAST(@jumlah_expired AS VARCHAR) +
-              ' transaksi expired diproses.';
+              ' transaction(s) expired and processed.';
     END TRY
     BEGIN CATCH
         IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
