@@ -3,6 +3,9 @@ package models;
 import config.DatabaseConfig;
 import entities.*;
 import helpers.DBHelper;
+import helpers.GUIHelper;
+import models.PaymentModel.HasilPembayaran;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -525,7 +528,7 @@ public class UserModel {
         List<RiwayatTopup> list = new ArrayList<>();
         String sql = "SELECT * FROM riwayat_topup WHERE id_pengguna = ? ORDER BY tanggal_topup DESC";
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, idCustomer);
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -543,26 +546,71 @@ public class UserModel {
     }
 
     public boolean addTopup(int idCustomer, BigDecimal nominal) {
-        Connection conn = null;
-        try {
-            conn = DatabaseConfig.getConnection();
-            conn.setAutoCommit(false);
-
-            String sqlRT = "INSERT INTO riwayat_topup (id_pengguna, nominal) VALUES (?, ?)";
-            try (PreparedStatement pstmt = conn.prepareStatement(sqlRT)) {
-                pstmt.setInt(1, idCustomer);
-                pstmt.setBigDecimal(2, nominal);
-                pstmt.executeUpdate();
-            }
-            
-            conn.commit();
-            return true;
+        String sqlRT = "INSERT INTO riwayat_topup (id_pengguna, nominal, status) VALUES (?, ?, 'PENDING')";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sqlRT)) {
+            pstmt.setInt(1, idCustomer);
+            pstmt.setBigDecimal(2, nominal);
+            return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            DBHelper.rollback(conn);
             e.printStackTrace();
             return false;
-        } finally {
-            try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
+        }
+    }
+
+    public List<RiwayatTopup> getAllTopupsFiltered(String statusFilter) {
+        List<RiwayatTopup> list = new ArrayList<>();
+        String sql = "SELECT * FROM riwayat_topup";
+        if (statusFilter != null && !statusFilter.equals("ALL")) {
+            sql += " WHERE status = ?";
+        }
+        sql += " ORDER BY tanggal_topup ASC";
+        
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            if (statusFilter != null && !statusFilter.equals("ALL")) {
+                pstmt.setString(1, statusFilter);
+            }
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    RiwayatTopup r = new RiwayatTopup();
+                    r.setIdPengguna(rs.getInt("id_pengguna"));
+                    r.setIdTopup(rs.getInt("id_topup"));
+                    r.setTanggalTopup(rs.getTimestamp("tanggal_topup"));
+                    r.setNominal(rs.getBigDecimal("nominal"));
+                    r.setStatus(rs.getString("status"));
+                    list.add(r);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean processTopup(int idTopup, boolean isApproved) {
+        String sql = "{CALL sp_ResponseTopup(?, ?)}";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+            CallableStatement cs = conn.prepareCall(sql)) {
+
+            cs.setInt(1, idTopup);
+            cs.setBoolean(2, isApproved);
+            cs.registerOutParameter(3, Types.NVARCHAR);
+
+            cs.execute();
+
+            String pesan = cs.getString(3);
+            boolean sukses = pesan != null && pesan.startsWith("SUKSES");
+
+            if(sukses) GUIHelper.showInfo(null, pesan);
+            else GUIHelper.showError(null, pesan);
+
+            return sukses;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            GUIHelper.showError(null, "ERROR: " + e.getMessage());
+            return false;
         }
     }
 }
