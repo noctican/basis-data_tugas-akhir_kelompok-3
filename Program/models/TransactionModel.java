@@ -210,4 +210,66 @@ public class TransactionModel {
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
+
+    public int checkoutReservasi(int idPengguna, String metodePembayaran, StringBuilder outErrorMessage) {
+        String sql = "{call sp_Checkout_Reservasi_HapusKeranjang(?, ?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idPengguna);
+            cstmt.setString(2, metodePembayaran);
+            cstmt.registerOutParameter(3, Types.INTEGER); // @id_transaksi_baru OUTPUT
+            
+            cstmt.execute();
+            return cstmt.getInt(3);
+        } catch (SQLException e) {
+            outErrorMessage.append(e.getMessage());
+            return -1;
+        }
+    }
+
+    public String bayarTransaksi(int idPengguna, int idTransaksi) {
+        String sql = "{call sp_BayarTransaksi(?, ?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idPengguna);
+            cstmt.setInt(2, idTransaksi);
+            cstmt.registerOutParameter(3, Types.NVARCHAR); // @hasil_pesan OUTPUT
+            
+            cstmt.execute();
+            return cstmt.getString(3);
+        } catch (SQLException e) {
+            return "ERROR: " + e.getMessage();
+        }
+    }
+
+    public int cekExpiredPembayaran() {
+        String sql = "{call sp_CekExpiredPembayaran(?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.registerOutParameter(1, Types.INTEGER); // @jumlah_expired OUTPUT
+            cstmt.execute();
+            return cstmt.getInt(1);
+        } catch (SQLException e) {
+            System.err.println("Gagal cek expired: " + e.getMessage());
+            return 0;
+        }
+    }
+    
+    public String gagalkanPembayaran(int idTransaksi) {
+        String sql = "{call sp_GagalkanPembayaran(?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idTransaksi);
+            cstmt.registerOutParameter(2, Types.NVARCHAR); // @hasil_pesan OUTPUT
+            
+            cstmt.execute();
+            return cstmt.getString(2);
+        } catch (SQLException e) {
+            return "ERROR: " + e.getMessage();
+        }
+    }
 }
