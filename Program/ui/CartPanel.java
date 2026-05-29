@@ -122,7 +122,7 @@ public class CartPanel extends JPanel {
             if (payConfirm == JOptionPane.YES_OPTION) {
                 String hasilPembayaran = transactionModel.bayarTransaksi(currentUserId, newTransactionId);
                 
-                if (hasilPembayaran.startsWith("SUKSES")) {
+                if (hasilPembayaran.startsWith("SUCCESS")) {
                     JOptionPane.showMessageDialog(this, hasilPembayaran, "Pembayaran Berhasil", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(this, hasilPembayaran, "Pembayaran Gagal", JOptionPane.ERROR_MESSAGE);
