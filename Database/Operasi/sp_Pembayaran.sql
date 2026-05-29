@@ -41,7 +41,6 @@ BEGIN
 
     IF @selisih_menit > 10
     BEGIN
-        -- Auto-expire: panggil SP gagalkan supaya stok kembali juga
         DECLARE @pesan_expire NVARCHAR(255);
         EXEC sp_GagalkanPembayaran @id_transaksi, @pesan_expire OUTPUT;
         SET @hasil_pesan = 'ERROR: Payment time has expired (> 10 minutes). Transaction automatically cancelled and stock returned.';
@@ -71,7 +70,7 @@ BEGIN
         WHERE  id_pengguna = @id_pengguna;
 
         UPDATE transaksi
-        SET    status_pembayaran = 'PAID'
+        SET    status_pembayaran = 'Paid'
         WHERE  id_transaksi = @id_transaksi;
 
         COMMIT TRANSACTION;
@@ -122,7 +121,7 @@ BEGIN
         WHERE  dt.id_transaksi = @id_transaksi;
 
         UPDATE transaksi
-        SET    status_pembayaran = 'FAILED'
+        SET    status_pembayaran = 'Failed'
         WHERE  id_transaksi = @id_transaksi;
 
         COMMIT TRANSACTION;
@@ -168,7 +167,7 @@ BEGIN
         JOIN   @expired             e ON dt.id_transaksi = e.id_transaksi;
 
         UPDATE transaksi
-        SET    status_pembayaran = 'FAILED'
+        SET    status_pembayaran = 'Failed'
         WHERE  id_transaksi IN (SELECT id_transaksi FROM @expired);
 
         SET @jumlah_expired = @@ROWCOUNT;

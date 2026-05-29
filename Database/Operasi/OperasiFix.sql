@@ -174,7 +174,7 @@ BEGIN
         WHERE  id_pengguna = @id_pengguna;
 
         UPDATE transaksi
-        SET    status_pembayaran = 'PAID'
+        SET    status_pembayaran = 'Paid'
         WHERE  id_transaksi = @id_transaksi;
 
         COMMIT TRANSACTION;
@@ -225,7 +225,7 @@ BEGIN
         WHERE  dt.id_transaksi = @id_transaksi;
 
         UPDATE transaksi
-        SET    status_pembayaran = 'FAILED'
+        SET    status_pembayaran = 'Failed'
         WHERE  id_transaksi = @id_transaksi;
 
         COMMIT TRANSACTION;
@@ -252,7 +252,7 @@ BEGIN
     INSERT INTO @expired (id_transaksi)
     SELECT id_transaksi
     FROM   transaksi
-    WHERE  status_pembayaran = 'PENDING'
+    WHERE  status_pembayaran = 'Pending'
       AND  DATEDIFF(MINUTE, tanggal_transaksi, GETDATE()) > 10;
 
     IF NOT EXISTS (SELECT 1 FROM @expired)
@@ -271,7 +271,7 @@ BEGIN
         JOIN   @expired             e ON dt.id_transaksi = e.id_transaksi;
 
         UPDATE transaksi
-        SET    status_pembayaran = 'FAILED'
+        SET    status_pembayaran = 'Failed'
         WHERE  id_transaksi IN (SELECT id_transaksi FROM @expired);
 
         SET @jumlah_expired = @@ROWCOUNT;
@@ -301,14 +301,14 @@ BEGIN
     BEGIN TRY
         IF @is_approve=0
         BEGIN
-            UPDATE riwayat_topup SET status = 'FAILED' WHERE id_topup = @id_topup;
+            UPDATE riwayat_topup SET status = 'Failed' WHERE id_topup = @id_topup;
             SET @msg_response = 'Top-up request rejected.'; 
         END
         ELSE
         BEGIN
             DECLARE @id_pengguna INT
             DECLARE @nominal DECIMAL(19, 4)
-            UPDATE riwayat_topup SET status = 'SUCCESS' WHERE id_topup = @id_topup;
+            UPDATE riwayat_topup SET status = 'Success' WHERE id_topup = @id_topup;
 
             SELECT @id_pengguna = id_pengguna, @nominal = nominal FROM riwayat_topup WHERE id_topup = @id_topup;
             UPDATE pelanggan SET wallet = wallet + @nominal WHERE id_pengguna = @id_pengguna;
@@ -336,7 +336,7 @@ BEGIN
     
     IF @id_keranjang IS NULL OR NOT EXISTS (SELECT 1 FROM detail_keranjang WHERE id_keranjang = @id_keranjang)
     BEGIN
-        RAISERROR('Gagal Checkout: Keranjang belanja kosong.', 16, 1);
+        RAISERROR('Failed Checkout: Keranjang belanja kosong.', 16, 1);
         RETURN;
     END
 
@@ -346,7 +346,7 @@ BEGIN
         WHERE dk.id_keranjang = @id_keranjang AND (vp.stock - dk.kuantitas) < 0
     )
     BEGIN
-        RAISERROR('Gagal Checkout: Stok produk tidak mencukupi untuk direservasi.', 16, 1);
+        RAISERROR('Failed Checkout: Stock product does not suffice for reservation.', 16, 1);
         RETURN;
     END
 
@@ -357,7 +357,7 @@ BEGIN
         BEGIN TRANSACTION;
 
         INSERT INTO transaksi (tanggal_transaksi, total_pembelian, status_pembayaran, metode_pembayaran)
-        VALUES (GETDATE(), @total_pembelian, 'PENDING', @metode_pembayaran);
+        VALUES (GETDATE(), @total_pembelian, 'Pending', @metode_pembayaran);
         
         SET @id_transaksi_baru = SCOPE_IDENTITY();
 
@@ -379,7 +379,7 @@ BEGIN
         DELETE FROM detail_keranjang WHERE id_keranjang = @id_keranjang;
 
         COMMIT TRANSACTION;
-        PRINT 'Keranjang dihapus, stok direservasi. ID Transaksi: ' + CAST(@id_transaksi_baru AS VARCHAR(10));
+        PRINT 'Cart deleted, stock reserved. ID Transaction: ' + CAST(@id_transaksi_baru AS VARCHAR(10));
         
     END TRY
     BEGIN CATCH
@@ -404,19 +404,19 @@ BEGIN
 
     IF @status_saat_ini IS NULL
     BEGIN
-        RAISERROR('Data transaksi tidak ditemukan.', 16, 1);
+        RAISERROR('Transaction not found.', 16, 1);
         RETURN;
     END
 
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        IF @status_saat_ini = 'PAID'
+        IF @status_saat_ini = 'Paid'
         BEGIN
-            PRINT 'Transaksi telah Lunas. Pengurangan stok produk telah menjadi permanen.';
+            PRINT 'Transaction is PAID. Stock reduction is permanent.';
         END
-        
-        ELSE IF @status_saat_ini IN ('FAILED')
+
+        ELSE IF @status_saat_ini IN ('Failed')
         BEGIN
             UPDATE vp
             SET vp.stock = vp.stock + dt.kuantitas
@@ -424,11 +424,11 @@ BEGIN
             JOIN detail_transaksi dt ON vp.id_produk = dt.id_produk AND vp.sku = dt.sku
             WHERE dt.id_transaksi = @id_transaksi;
 
-            PRINT 'Transaksi Gagal. Stok produk telah dikembalikan ke database.';
+            PRINT 'Transaction Failed. Product stock has been returned to the database.';
         END
         ELSE
         BEGIN
-            PRINT 'Status saat ini adalah PENDING. Menunggu pembayaran lunas atau batal.';
+            PRINT 'Current status is PENDING. Awaiting payment confirmation or cancellation.';
         END
 
         COMMIT TRANSACTION;

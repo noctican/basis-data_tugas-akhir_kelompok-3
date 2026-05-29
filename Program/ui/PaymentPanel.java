@@ -122,9 +122,9 @@ public class PaymentPanel extends JPanel {
                 String status = value == null ? "" : value.toString();
                 if (!isSelected) {
                     switch (status) {
-                        case "PENDING": setBackground(new Color(255, 237, 180)); setForeground(Color.DARK_GRAY); break;
-                        case "PAID":    setBackground(new Color(200, 240, 200)); setForeground(new Color(0, 100, 0)); break;
-                        case "FAILED":  setBackground(new Color(255, 200, 200)); setForeground(new Color(150, 0, 0)); break;
+                        case "Pending": setBackground(new Color(255, 237, 180)); setForeground(Color.DARK_GRAY); break;
+                        case "Paid":    setBackground(new Color(200, 240, 200)); setForeground(new Color(0, 100, 0)); break;
+                        case "Failed":  setBackground(new Color(255, 200, 200)); setForeground(new Color(150, 0, 0)); break;
                         default:        setBackground(Color.WHITE); setForeground(Color.BLACK);
                     }
                 }
@@ -214,7 +214,7 @@ public class PaymentPanel extends JPanel {
             int    detikBerlalu = (int)      row[5];
 
             String sisaWaktu;
-            if ("PENDING".equals(status)) {
+            if ("Pending".equals(status)) {
                 int sisa = BATAS_DETIK - detikBerlalu;
                 if (sisa <= 0) {
                     sisaWaktu = "Habis";
@@ -223,7 +223,7 @@ public class PaymentPanel extends JPanel {
                     int s = sisa % 60;
                     sisaWaktu = String.format("%d:%02d", m, s);
                 }
-            } else if ("PAID".equals(status)) {
+            } else if ("Paid".equals(status)) {
                 sisaWaktu = "LUNAS";
             } else {
                 sisaWaktu = "GAGAL";
