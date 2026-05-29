@@ -6,14 +6,6 @@ import helpers.DBHelper;
 import java.sql.*;
 import java.math.BigDecimal;
 
-/**
- * PaymentModel – menangani proses pembayaran via wallet.
- *
- * Memanggil tiga Stored Procedure:
- *   1. sp_BayarTransaksi      → bayar & kurangi wallet
- *   2. sp_GagalkanPembayaran  → batalkan & kembalikan stok
- *   3. sp_CekExpiredPembayaran→ batch-expire semua PENDING > 10 menit
- */
 public class PaymentModel {
 
     // ----------------------------------------------------------------

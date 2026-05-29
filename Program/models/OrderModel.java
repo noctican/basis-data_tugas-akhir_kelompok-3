@@ -9,16 +9,13 @@ import java.util.List;
 
 public class OrderModel {
 
-    // 1. Method untuk mengambil semua pesanan (memanggil method filter dengan parameter "All")
     public List<Transaksi> getAllOrders() {
         return getAllOrdersFiltered("All", "All");
     }
 
-    // 2. Method untuk mengambil pesanan berdasarkan filter Pembayaran dan Pengiriman
     public List<Transaksi> getAllOrdersFiltered(String paymentStatus, String shippingStatus) {
         List<Transaksi> list = new ArrayList<>();
         
-        // Gunakan LEFT JOIN agar transaksi tetap muncul meskipun data pengirimannya belum ada
         StringBuilder query = new StringBuilder(
             "SELECT t.id_transaksi, t.tanggal_transaksi, t.total_pembelian, t.status_pembayaran, t.metode_pembayaran, " +
             "p.no_resi, p.status_pengiriman " +
@@ -26,15 +23,12 @@ public class OrderModel {
             "LEFT JOIN pengiriman p ON t.id_transaksi = p.id_transaksi WHERE 1=1 "
         );
 
-        // Tambahkan kondisi query untuk Filter Pembayaran
         if (paymentStatus != null && !"All".equalsIgnoreCase(paymentStatus)) {
             query.append("AND t.status_pembayaran = ? ");
         }
 
-        // Tambahkan kondisi query untuk Filter Pengiriman
         if (shippingStatus != null && !"All".equalsIgnoreCase(shippingStatus)) {
             if ("Not Processed".equalsIgnoreCase(shippingStatus) || "Process".equalsIgnoreCase(shippingStatus)) {
-                // Jika filter mencari Process, cari yang statusnya NULL (belum dibuat di DB) atau 'Process'
                 query.append("AND (p.status_pengiriman IS NULL OR p.status_pengiriman = 'Process') ");
             } else {
                 query.append("AND p.status_pengiriman = ? ");
@@ -46,7 +40,6 @@ public class OrderModel {
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement ps = conn.prepareStatement(query.toString())) {
             
-            // Set parameter PreparedStatement secara dinamis
             int paramIndex = 1;
             if (paymentStatus != null && !"All".equalsIgnoreCase(paymentStatus)) {
                 ps.setString(paramIndex++, paymentStatus);
@@ -59,7 +52,6 @@ public class OrderModel {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    // Buat objek Transaksi
                     Transaksi t = new Transaksi();
                     t.setIdTransaksi(rs.getInt("id_transaksi"));
                     t.setTanggalTransaksi(rs.getTimestamp("tanggal_transaksi"));
@@ -67,26 +59,20 @@ public class OrderModel {
                     t.setStatusPembayaran(rs.getString("status_pembayaran"));
                     t.setMetodePembayaran(rs.getString("metode_pembayaran"));
                     
-                    // Buat objek Pengiriman
                     Pengiriman p = new Pengiriman();
                     String noResi = rs.getString("no_resi");
                     String statusDb = rs.getString("status_pengiriman");
 
                     if (noResi != null) {
                         p.setNoResi(noResi);
-                        // Jika status_pengiriman di database tidak null, pakai. Jika null, default ke 'Process'
                         p.setStatusPengiriman(statusDb != null ? statusDb : "Process");
                         p.setIdTransaksi(t.getIdTransaksi()); 
                     } else {
-                        // Jika no_resi null (berarti data belum ada di tabel pengiriman), 
-                        // kita berikan status default 'Process' ke objek Java.
                         p.setStatusPengiriman("Process");
                     }
                     
-                    // PENTING: Masukkan objek Pengiriman (p) ke dalam Transaksi (t)
                     t.setPengiriman(p); 
                     
-                    // PENTING: Masukkan Transaksi (t) ke dalam list
                     list.add(t);
                 }
             }
@@ -97,7 +83,6 @@ public class OrderModel {
         return list;
     }
 
-    // 3. Method untuk memperbarui (atau memasukkan) status pengiriman ke database
     public boolean updateShippingStatus(int idTransaksi, String noResi, String statusPengiriman) {
         String checkSql = "SELECT COUNT(*) FROM pengiriman WHERE id_transaksi = ?";
         String updateSql = "UPDATE pengiriman SET status_pengiriman = ?, no_resi = ?, tanggal_pengiriman = GETDATE() WHERE id_transaksi = ?";
@@ -106,7 +91,6 @@ public class OrderModel {
         try (Connection conn = DatabaseConfig.getConnection()) {
             boolean exists = false;
 
-            // Cek apakah data pengiriman untuk transaksi ini sudah pernah dibuat
             try (PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
                 psCheck.setInt(1, idTransaksi);
                 try (ResultSet rs = psCheck.executeQuery()) {
@@ -116,7 +100,6 @@ public class OrderModel {
                 }
             }
 
-            // Jika sudah ada, lakukan UPDATE. Jika belum, lakukan INSERT.
             if (exists) {
                 try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
                     psUpdate.setString(1, statusPengiriman); // 'Delivered' atau 'Canceled'
@@ -128,7 +111,7 @@ public class OrderModel {
                 try (PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
                     psInsert.setString(1, noResi);
                     psInsert.setInt(2, idTransaksi);
-                    psInsert.setString(3, statusPengiriman); // 'Delivered' atau 'Canceled'
+                    psInsert.setString(3, statusPengiriman); 
                     return psInsert.executeUpdate() > 0;
                 }
             }
