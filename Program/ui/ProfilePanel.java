@@ -2,6 +2,7 @@ package ui;
 
 import entities.*;
 import helpers.GUIHelper;
+import helpers.NumberHelper;
 import models.UserModel;
 import session.UserSession;
 import javax.swing.*;
@@ -165,7 +166,7 @@ public class ProfilePanel extends JPanel {
             if (UserSession.getRole() == UserSession.Role.PELANGGAN) {
                 Pelanggan pelanggan = userModel.getPelangganById(currentUser.getIdPengguna());
                 txtJenisMember.setText(pelanggan != null && pelanggan.getJenisMember() != null ? pelanggan.getJenisMember() : "Reguler");
-                txtWallet.setText(pelanggan != null ? String.valueOf(pelanggan.getWallet()) : "0");
+                txtWallet.setText(pelanggan != null ? String.valueOf(NumberHelper.formatNumber(pelanggan.getWallet())) : "0");
                 txtPoin.setText(pelanggan != null ? String.valueOf(pelanggan.getPoin()) : "0");
                 txtTanggalGabung.setText(pelanggan != null && pelanggan.getTanggalBergabung() != null ? pelanggan.getTanggalBergabung().toString() : "-");
             }
@@ -339,7 +340,7 @@ public class ProfilePanel extends JPanel {
     private void refreshTopup() {
         topupModel.setRowCount(0);
         List<RiwayatTopup> list = userModel.getTopupHistory(UserSession.getCurrentUser().getIdPengguna());
-        for (RiwayatTopup r : list) topupModel.addRow(new Object[]{r.getTanggalTopup(), r.getNominal(), r.getStatus()});
+        for (RiwayatTopup r : list) topupModel.addRow(new Object[]{r.getTanggalTopup(), NumberHelper.formatNumber(r.getNominal()), r.getStatus()});
     }
 
     private void handleDeleteAlamat() {

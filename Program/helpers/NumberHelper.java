@@ -7,7 +7,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
 public class NumberHelper {
-    public static String formatNumber(double angka, boolean showCurrency, boolean showDecimal) {
+    public static String formatNumber(Number angka, boolean showCurrency, boolean showDecimal) {
         Locale localeID = Locale.of("id", "ID");
         NumberFormat formatter;
 
@@ -25,7 +25,7 @@ public class NumberHelper {
         return formatter.format(angka);
     }
 
-    public static String formatNumber(double angka) {
+    public static String formatNumber(Number angka) {
         Locale localeID = Locale.of("id", "ID");
         NumberFormat formatter;
 
@@ -36,6 +36,8 @@ public class NumberHelper {
 
         return formatter.format(angka);
     }
+
+
 
     public static double parseRupiahToDouble(String rupiahString) {
         if (rupiahString == null || rupiahString.trim().isEmpty()) {
@@ -65,10 +67,7 @@ public class NumberHelper {
         tabel.getColumnModel().getColumn(indexKolom).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public void setValue(Object value) {
-                if (value instanceof Number) {
-                    // Pakai format Rupiah dengan 2 angka di belakang koma
-                    value = formatNumber(((Number) value).doubleValue(), true, true);
-                }
+                if (value instanceof Number) value = formatNumber((Number) value);
                 super.setValue(value);
             }
         });

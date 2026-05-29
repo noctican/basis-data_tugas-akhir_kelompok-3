@@ -54,7 +54,7 @@ public class CatalogPanel extends JPanel {
             @Override
             public void setValue(Object value) {
                 if (value instanceof Number) {
-                    value = NumberHelper.formatNumber(((Number) value).doubleValue(), true, true);
+                    value = NumberHelper.formatNumber((Number) value);
                 }
                 super.setValue(value);
             }
