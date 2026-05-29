@@ -21,4 +21,14 @@ public class Transaksi {
     public void setStatusPembayaran(String s) { this.statusPembayaran = s; }
     public String getMetodePembayaran() { return metodePembayaran; }
     public void setMetodePembayaran(String m) { this.metodePembayaran = m; }
+
+    private Pengiriman pengiriman; 
+
+    public Pengiriman getPengiriman() {
+        return pengiriman;
+    }
+
+    public void setPengiriman(Pengiriman pengiriman) {
+        this.pengiriman = pengiriman;
+    }
 }

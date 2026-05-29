@@ -65,7 +65,7 @@ public class MainFrame extends JFrame {
         addNavButton("Inventory (Catalog)", "CATALOG");
         addNavButton("Human Resources", "HR");
         addNavButton("Customers & Members", "CUSTOMERS");
-        addNavButton("Order Management", "ORDERS_ADMIN");
+        addNavButton("Order and Shipping", "ORDERS_ADMIN");
         addNavButton("Global Transactions", "ALL_TRANS");
         addNavButton("Returns Validation", "RETURNS_ADMIN");
         addNavButton("Top-up Requests", "TOPUP_ADMIN");
@@ -107,7 +107,7 @@ public class MainFrame extends JFrame {
             contentArea.add(new CatalogPanel(), "CATALOG");
             contentArea.add(new HRPanel(this.loggedInUserId), "HR");
             contentArea.add(new CustomerPanel(), "CUSTOMERS");
-            contentArea.add(new OrderAdminPanel(), "ORDERS_ADMIN");
+            contentArea.add(new OrderAndShippingPanel(), "ORDERS_ADMIN");
             contentArea.add(new AllTransactionsPanel(), "ALL_TRANS");
             contentArea.add(new ReturnAdminPanel(), "RETURNS_ADMIN");
             contentArea.add(new TopupAdminPanel(), "TOPUP_ADMIN");
