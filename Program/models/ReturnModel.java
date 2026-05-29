@@ -40,7 +40,7 @@ public class ReturnModel {
 
 
     public boolean approveReturn(int idRetur) {
-        String sql = "UPDATE retur SET status = 'APPROVED' WHERE id_retur = ?";
+        String sql = "UPDATE retur SET status = 'Approved' WHERE id_retur = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
@@ -89,7 +89,7 @@ public class ReturnModel {
     }
     
     public boolean rejectReturn(int idRetur) {
-        String sql = "UPDATE retur SET status = 'REJECTED' WHERE id_retur = ?";
+        String sql = "UPDATE retur SET status = 'Rejected' WHERE id_retur = ?";
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
