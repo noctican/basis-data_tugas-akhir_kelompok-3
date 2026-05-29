@@ -45,7 +45,7 @@ public class PaymentModel {
             cs.execute();
 
             String pesan = cs.getString(3);
-            boolean sukses = pesan != null && pesan.startsWith("SUCCESS");
+            boolean sukses = pesan != null && pesan.startsWith("SUKSES");
             return new HasilPembayaran(sukses, pesan);
 
         } catch (SQLException e) {
@@ -69,7 +69,7 @@ public class PaymentModel {
             cs.execute();
 
             String pesan = cs.getString(2);
-            boolean sukses = pesan != null && pesan.startsWith("SUCCESS");
+            boolean sukses = pesan != null && pesan.startsWith("SUKSES");
             return new HasilPembayaran(sukses, pesan);
 
         } catch (SQLException e) {
