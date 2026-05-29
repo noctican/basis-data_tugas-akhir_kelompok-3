@@ -4,6 +4,7 @@ import entities.*;
 import helpers.GUIHelper;
 import models.CatalogModel;
 import models.TransactionModel;
+import models.ProductAnalysisModel;
 import session.UserSession;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,13 +15,16 @@ import java.util.List;
 public class ShopPanel extends JPanel {
     private CatalogModel catalogModel;
     private TransactionModel transactionModel;
+    private ProductAnalysisModel analysisModel;
     private JTable productTable;
     private DefaultTableModel productModel;
     private JTextField searchField;
+    private JLabel recommendationLabel;
 
     public ShopPanel() {
         catalogModel = new CatalogModel();
         transactionModel = new TransactionModel();
+        analysisModel = new ProductAnalysisModel();
         setLayout(new BorderLayout());
 
         setupTopPanel();
@@ -47,19 +51,76 @@ public class ShopPanel extends JPanel {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         productTable = new JTable(productModel);
+
+        productTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                updateRecommendations();
+            }
+        });
+
         add(new JScrollPane(productTable), BorderLayout.CENTER);
     }
 
     private void setupBottomPanel() {
+        JPanel containerBottom = new JPanel();
+        containerBottom.setLayout(new BoxLayout(containerBottom, BoxLayout.Y_AXIS));
+
+        // 6. BUAT PANEL REKOMENDASI (Frequently Bought Together)
+        JPanel recPanel = new JPanel(new BorderLayout());
+        recPanel.setBorder(BorderFactory.createTitledBorder("Frequently Bought Together"));
+        
+        recommendationLabel = new JLabel("<html><i style='color:gray;'>Select a product to see recommendation bundles...</i></html>");
+        recommendationLabel.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+        recPanel.add(recommendationLabel, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
         JButton addBtn = new JButton("Add Selected to Cart");
         addBtn.addActionListener(e -> handleAddToCart());
-        add(addBtn, BorderLayout.SOUTH);
+        buttonPanel.add(addBtn);
+
+        containerBottom.add(recPanel);
+        containerBottom.add(buttonPanel);
+
+        add(containerBottom, BorderLayout.SOUTH);
+    }
+
+    private void updateRecommendations() {
+        int row = productTable.getSelectedRow();
+        if (row == -1) {
+            recommendationLabel.setText("<html><i style='color:gray;'>Select a product to see recommendation bundles...</i></html>");
+            return;
+        }
+
+        try {
+            int idProduk = (int) productModel.getValueAt(row, 0);
+            
+            // Panggil query via model Java
+            List<Object[]> recs = analysisModel.getTop3ProductsBoughtTogether(idProduk);
+
+            if (recs.isEmpty()) {
+                recommendationLabel.setText("<html><span style='color:orange; font-weight:bold;'>💡 Tip:</span> <i>Be the first to pair this product with another item!</i></html>");
+            } else {
+                StringBuilder html = new StringBuilder("<html><span style='color:navy; font-weight:bold;'>Customers who bought this also bought:</span><ul style='margin-top: 3px;'>");
+                for (Object[] rec : recs) {
+                    String namaProdukPendamping = (String) rec[0];
+                    html.append("<li style='font-weight:bold; color:#333;'>").append(namaProdukPendamping).append("</li>");
+                }
+                html.append("</ul></html>");
+                recommendationLabel.setText(html.toString());
+            }
+        } catch (Exception ex) {
+            recommendationLabel.setText("<html><i style='color:red;'>Failed to load recommendations.</i></html>");
+        }
     }
 
     private void refreshProducts() {
         productModel.setRowCount(0);
         List<Produk> list = catalogModel.searchProduk(searchField.getText());
         for (Produk p : list) productModel.addRow(new Object[]{p.getIdProduk(), p.getNamaProduk(), p.getHargaBase(), p.getDeskripsiProduk()});
+
+        if (recommendationLabel != null) {
+            recommendationLabel.setText("<html><i style='color:gray;'>Select a product to see recommendation bundles...</i></html>");
+        }
     }
 
     private void handleAddToCart() {
