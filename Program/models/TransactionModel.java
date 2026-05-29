@@ -161,4 +161,176 @@ public class TransactionModel {
             try { if (conn != null) conn.setAutoCommit(true); } catch (SQLException ex) {}
         }
     }
+
+    public List<Object[]> getTop5PurchasedItems(int idPengguna) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT Nama_Produk, Kategori, Total_Jumlah, Harga_Satuan FROM v_Top5BarangPelanggan WHERE ID_Pengguna = ?";
+        
+        try (Connection conn = DatabaseConfig.getConnection(); 
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, idPengguna);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Object[]{
+                        rs.getString("Nama_Produk"),
+                        rs.getString("Kategori"),
+                        rs.getInt("Total_Jumlah"),
+                        rs.getBigDecimal("Harga_Satuan")
+                    });
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public boolean updateCartQuantity(int idKeranjang, int idProduk, String sku, int newQty) {
+        String sql = "UPDATE detail_keranjang SET kuantitas = ?, sub_total = (SELECT harga_base * ? FROM produk WHERE id_produk = ?) WHERE id_keranjang = ? AND id_produk = ? AND sku = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, newQty);
+            pstmt.setInt(2, newQty);
+            pstmt.setInt(3, idProduk);
+            pstmt.setInt(4, idKeranjang);
+            pstmt.setInt(5, idProduk);
+            pstmt.setString(6, sku);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public boolean deleteCartItem(int idKeranjang, int idProduk, String sku) {
+        String sql = "DELETE FROM detail_keranjang WHERE id_keranjang = ? AND id_produk = ? AND sku = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idKeranjang);
+            pstmt.setInt(2, idProduk);
+            pstmt.setString(3, sku);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public int checkoutReservasi(int idPengguna, String metodePembayaran, StringBuilder outErrorMessage) {
+        String sql = "{call sp_Checkout_Reservasi_HapusKeranjang(?, ?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idPengguna);
+            cstmt.setString(2, metodePembayaran);
+            cstmt.registerOutParameter(3, Types.INTEGER); // @id_transaksi_baru OUTPUT
+            
+            cstmt.execute();
+            return cstmt.getInt(3);
+        } catch (SQLException e) {
+            outErrorMessage.append(e.getMessage());
+            return -1;
+        }
+    }
+
+    public String bayarTransaksi(int idPengguna, int idTransaksi) {
+        String sql = "{call sp_BayarTransaksi(?, ?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idPengguna);
+            cstmt.setInt(2, idTransaksi);
+            cstmt.registerOutParameter(3, Types.NVARCHAR); // @hasil_pesan OUTPUT
+            
+            cstmt.execute();
+            return cstmt.getString(3);
+        } catch (SQLException e) {
+            return "ERROR: " + e.getMessage();
+        }
+    }
+
+    public int cekExpiredPembayaran() {
+        String sql = "{call sp_CekExpiredPembayaran(?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.registerOutParameter(1, Types.INTEGER); // @jumlah_expired OUTPUT
+            cstmt.execute();
+            return cstmt.getInt(1);
+        } catch (SQLException e) {
+            System.err.println("Gagal cek expired: " + e.getMessage());
+            return 0;
+        }
+    }
+    
+    public String gagalkanPembayaran(int idTransaksi) {
+        String sql = "{call sp_GagalkanPembayaran(?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idTransaksi);
+            cstmt.registerOutParameter(2, Types.NVARCHAR); // @hasil_pesan OUTPUT
+            
+            cstmt.execute();
+            return cstmt.getString(2);
+        } catch (SQLException e) {
+            return "ERROR: " + e.getMessage();
+        }
+    }
+
+    public List<Object[]> getTransactionsByUser(int idPengguna) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT t.id_transaksi, t.tanggal_transaksi, t.total_pembelian, " +
+                    "t.status_pembayaran, t.metode_pembayaran " +
+                    "FROM transaksi t " +
+                    "JOIN pelanggan_transaksi pt ON t.id_transaksi = pt.id_transaksi " +
+                    "WHERE pt.id_pengguna = ? " +
+                    "ORDER BY t.tanggal_transaksi DESC";
+                    
+        try (Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, idPengguna);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getInt("id_transaksi"),
+                    rs.getDate("tanggal_transaksi"),
+                    rs.getBigDecimal("total_pembelian"),
+                    rs.getString("status_pembayaran"),
+                    rs.getString("metode_pembayaran")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Object[]> getTransactionDetails(int idTransaksi) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT id_produk, sku, harga_pembelian, kuantitas " +
+                    "FROM detail_transaksi " +
+                    "WHERE id_transaksi = ?";
+                    
+        try (Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, idTransaksi);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                java.math.BigDecimal harga = rs.getBigDecimal("harga_pembelian");
+                int qty = rs.getInt("kuantitas");
+                java.math.BigDecimal subtotal = harga.multiply(new java.math.BigDecimal(qty));
+                
+                list.add(new Object[]{
+                    rs.getInt("id_produk"),
+                    rs.getString("sku"),
+                    harga,
+                    qty,
+                    subtotal
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
 }

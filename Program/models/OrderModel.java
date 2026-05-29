@@ -9,25 +9,39 @@ import java.util.List;
 
 public class OrderModel {
     public List<Transaksi> getAllOrders() {
+        return getAllOrdersFiltered(null);
+    }
+
+    public List<Transaksi> getAllOrdersFiltered(String status) {
         List<Transaksi> list = new ArrayList<>();
-        String sql = "SELECT * FROM transaksi ORDER BY tanggal_transaksi DESC";
-        try (Connection conn = DatabaseConfig.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Transaksi t = new Transaksi();
-                t.setIdTransaksi(rs.getInt("id_transaksi"));
-                t.setTanggalTransaksi(rs.getTimestamp("tanggal_transaksi"));
-                t.setTotalPembelian(rs.getBigDecimal("total_pembelian"));
-                t.setStatusPembayaran(rs.getString("status_pembayaran"));
-                t.setMetodePembayaran(rs.getString("metode_pembayaran"));
-                list.add(t);
-            }
-        } catch (SQLException e) { 
-            e.printStackTrace(); 
+        String sql = "SELECT * FROM transaksi";
+        if (status != null && !status.equals("ALL")) {
+            sql += " WHERE status_pembayaran = ?";
         }
+        sql += " ORDER BY tanggal_transaksi DESC";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            if (status != null && !status.equals("ALL")) {
+                pstmt.setString(1, status);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Transaksi t = new Transaksi();
+                    t.setIdTransaksi(rs.getInt("id_transaksi"));
+                    t.setTanggalTransaksi(rs.getTimestamp("tanggal_transaksi"));
+                    t.setTotalPembelian(rs.getBigDecimal("total_pembelian"));
+                    t.setStatusPembayaran(rs.getString("status_pembayaran"));
+                    t.setMetodePembayaran(rs.getString("metode_pembayaran"));
+                    list.add(t);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
+
 
     public boolean shipOrder(int idTransaksi, String resi) {
         Connection conn = null;

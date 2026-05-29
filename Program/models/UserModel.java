@@ -3,9 +3,13 @@ package models;
 import config.DatabaseConfig;
 import entities.*;
 import helpers.DBHelper;
+import helpers.GUIHelper;
+import models.PaymentModel.HasilPembayaran;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 public class UserModel {
     
@@ -104,6 +108,28 @@ public class UserModel {
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return null;    
+    }
+
+    public Pelanggan getPelangganById(int idPengguna) {
+        String sql = "SELECT * FROM pelanggan WHERE id_pengguna = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idPengguna);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Pelanggan p = new Pelanggan();
+                    p.setIdPengguna(idPengguna);
+                    p.setJenisMember(rs.getString("jenis_member"));
+                    p.setTanggalBergabung(rs.getDate("tanggal_bergabung"));
+                    p.setPoin(rs.getInt("poin"));
+                    p.setUsedVoucherPercentage(rs.getBoolean("is_used_voucher_percentage"));
+                    p.setUsedVoucherPrice(rs.getBoolean("is_used_voucher_price"));
+                    p.setWallet(rs.getBigDecimal("wallet"));
+                    return p;
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
     }
 
     public List<Karyawan> getKaryawanByDepartemen(int idDepartemen) {
@@ -462,17 +488,130 @@ public class UserModel {
     public boolean addAlamat(int idPengguna, String provinsi, String kota, String jalan, String namaPenerima, String noTelp) {
         String sql = "INSERT INTO alamat_pelanggan (id_pengguna, provinsi, kota, jalan, nama_penerima, no_telp) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConfig.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, idPengguna);
-        ps.setString(2, provinsi);
-        ps.setString(3, kota);
-        ps.setString(4, jalan);
-        ps.setString(5, namaPenerima);
-        ps.setString(6, noTelp);
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idPengguna);
+            ps.setString(2, provinsi);
+            ps.setString(3, kota);
+            ps.setString(4, jalan);
+            ps.setString(5, namaPenerima);
+            ps.setString(6, noTelp);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
+
+    public boolean updateProfile(Pengguna p) {
+        String sql = "UPDATE pengguna SET nama_depan = ?, nama_belakang = ?, nomor_telepon = ? WHERE id_pengguna = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, p.getNamaDepan());
+            pstmt.setString(2, p.getNamaBelakang());
+            pstmt.setString(3, p.getNomorTelepon());
+            pstmt.setInt(4, p.getIdPengguna());
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public boolean updatePassword(int idPengguna, String oldPass, String newPass) {
+        String sql = "UPDATE pengguna SET password = ? WHERE id_pengguna = ? AND password = ?";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, newPass);
+            pstmt.setInt(2, idPengguna);
+            pstmt.setString(3, oldPass);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    public List<RiwayatTopup> getTopupHistory(int idCustomer) {
+        List<RiwayatTopup> list = new ArrayList<>();
+        String sql = "SELECT * FROM riwayat_topup WHERE id_pengguna = ? ORDER BY tanggal_topup DESC";
+        try (Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, idCustomer);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    RiwayatTopup r = new RiwayatTopup();
+                    r.setIdPengguna(rs.getInt("id_pengguna"));
+                    r.setIdTopup(rs.getInt("id_topup"));
+                    r.setTanggalTopup(rs.getTimestamp("tanggal_topup"));
+                    r.setNominal(rs.getBigDecimal("nominal"));
+                    r.setStatus(rs.getString("status"));
+                    list.add(r);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean addTopup(int idCustomer, BigDecimal nominal) {
+        String sqlRT = "INSERT INTO riwayat_topup (id_pengguna, nominal, status) VALUES (?, ?, 'PENDING')";
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sqlRT)) {
+            pstmt.setInt(1, idCustomer);
+            pstmt.setBigDecimal(2, nominal);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public List<RiwayatTopup> getAllTopupsFiltered(String statusFilter) {
+        List<RiwayatTopup> list = new ArrayList<>();
+        String sql = "SELECT * FROM riwayat_topup";
+        if (statusFilter != null && !statusFilter.equals("ALL")) {
+            sql += " WHERE status = ?";
+        }
+        sql += " ORDER BY tanggal_topup ASC";
+        
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            if (statusFilter != null && !statusFilter.equals("ALL")) {
+                pstmt.setString(1, statusFilter);
+            }
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    RiwayatTopup r = new RiwayatTopup();
+                    r.setIdPengguna(rs.getInt("id_pengguna"));
+                    r.setIdTopup(rs.getInt("id_topup"));
+                    r.setTanggalTopup(rs.getTimestamp("tanggal_topup"));
+                    r.setNominal(rs.getBigDecimal("nominal"));
+                    r.setStatus(rs.getString("status"));
+                    list.add(r);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    public boolean processTopup(int idTopup, boolean isApproved) {
+        String sql = "{CALL sp_ResponseTopup(?, ?, ?)}";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+            CallableStatement cs = conn.prepareCall(sql)) {
+
+            cs.setInt(1, idTopup);
+            cs.setBoolean(2, isApproved);
+            cs.registerOutParameter(3, Types.NVARCHAR);
+
+            cs.execute();
+
+            String pesan = cs.getString(3);
+            boolean sukses = pesan != null && pesan.startsWith("SUCCESS");
+
+            if(sukses) GUIHelper.showInfo(null, pesan);
+            else GUIHelper.showError(null, pesan);
+
+            return sukses;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            GUIHelper.showError(null, "ERROR: " + e.getMessage());
+            return false;
+        }
+    }
 }

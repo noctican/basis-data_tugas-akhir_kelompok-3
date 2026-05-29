@@ -65,16 +65,19 @@ public class MainFrame extends JFrame {
         addNavButton("Inventory (Catalog)", "CATALOG");
         addNavButton("Human Resources", "HR");
         addNavButton("Customers & Members", "CUSTOMERS");
-        addNavButton("Orders Management", "ORDERS_ADMIN");
-        addNavButton("Returns & Returs", "RETURNS_ADMIN");
+        addNavButton("Order Management", "ORDERS_ADMIN");
+        addNavButton("Global Transactions", "ALL_TRANS");
+        addNavButton("Returns Validation", "RETURNS_ADMIN");
+        addNavButton("Top-up Requests", "TOPUP_ADMIN");
+        addNavButton("My Profile", "PROFILE");
     }
 
     private void setupCustomerSidebar() {
         addNavButton("Shop Products", "SHOP");
         addNavButton("My Cart", "CART");
         addNavButton("My Orders", "MY_ORDERS");
-        addNavButton("My Profile & Addresses", "PROFILE");
         addNavButton("Returns & Help", "MY_RETURNS");
+        addNavButton("My Profile & Address", "PROFILE");
     }
 
     private void addNavButton(String text, String cardName) {
@@ -105,11 +108,14 @@ public class MainFrame extends JFrame {
             contentArea.add(new HRPanel(this.loggedInUserId), "HR");
             contentArea.add(new CustomerPanel(), "CUSTOMERS");
             contentArea.add(new OrderAdminPanel(), "ORDERS_ADMIN");
+            contentArea.add(new AllTransactionsPanel(), "ALL_TRANS");
             contentArea.add(new ReturnAdminPanel(), "RETURNS_ADMIN");
+            contentArea.add(new TopupAdminPanel(), "TOPUP_ADMIN");
+            contentArea.add(new ProfilePanel(), "PROFILE");
         } else {
             contentArea.add(new ShopPanel(), "SHOP");
             contentArea.add(new CartPanel(), "CART");
-            contentArea.add(createPlaceholder("Your Order History"), "MY_ORDERS");
+            contentArea.add(new OrderPanel(), "MY_ORDERS");
             contentArea.add(new ProfilePanel(), "PROFILE");
             contentArea.add(createPlaceholder("Initiate Returns / Help"), "MY_RETURNS");
         }

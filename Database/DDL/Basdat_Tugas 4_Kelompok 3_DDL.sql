@@ -97,13 +97,23 @@ CREATE TABLE pelanggan (
 	jenis_member VARCHAR(50) DEFAULT('BLUE'),
 	tanggal_bergabung DATE DEFAULT(GETDATE()),
 	poin INT DEFAULT(0),
-	wallet DECIMAL(36, 2) DEFAULT(0),
+	wallet DECIMAL(36, 2) NOT NULL DEFAULT(0),
 	is_used_voucher_percentage BIT DEFAULT(0),
 	is_used_voucher_price BIT DEFAULT(0),
 	CONSTRAINT fk_pengguna_pelanggan FOREIGN KEY (id_pengguna) REFERENCES pengguna(id_pengguna),
 	CONSTRAINT fk_member_pelanggan FOREIGN KEY (jenis_member) REFERENCES member(jenis),
 );
 GO
+
+CREATE TABLE riwayat_topup (
+	id_pengguna INT NOT NULL,
+	id_topup INT IDENTITY(1, 1) NOT NULL,
+	tanggal_topup DATETIME DEFAULT(GETDATE()),
+	nominal DECIMAL(19, 4) DEFAULT(0),
+	status VARCHAR(50) NOT NULL DEFAULT('PENDING'), -- PENDING, SUCCESS, FAILED
+	PRIMARY KEY (id_pengguna, id_topup),
+	CONSTRAINT fk_pelanggan_topup FOREIGN KEY (id_pengguna) REFERENCES pelanggan(id_pengguna),
+);
 
 CREATE TABLE alamat_pelanggan (
 	id_pengguna INT NOT NULL,
