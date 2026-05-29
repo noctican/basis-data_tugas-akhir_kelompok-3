@@ -39,14 +39,75 @@ public class ReturnModel {
 
 
 
-    public boolean approveReturn(int idRetur) {
-        String sql = "UPDATE retur SET status = 'Approved' WHERE id_retur = ?";
+    public List<Object[]> getReturnsByCustomer(int idPengguna) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT r.id_retur, r.id_transaksi, r.tanggal_pengembalian, r.status, " +
+                       "dr.id_produk, dr.sku, dr.kuantitas, dr.alasan " +
+                       "FROM retur r " +
+                       "JOIN detail_retur dr ON r.id_retur = dr.id_retur " +
+                       "JOIN pelanggan_transaksi pt ON r.id_transaksi = pt.id_transaksi " +
+                       "WHERE pt.id_pengguna = ? " +
+                       "ORDER BY r.id_retur DESC";
+        
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(query)) {
             
-            pstmt.setInt(1, idRetur);
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;
+            ps.setInt(1, idPengguna);
+            ResultSet rs = ps.executeQuery();
+            
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getInt("id_retur"),
+                    rs.getInt("id_transaksi"),
+                    rs.getDate("tanggal_pengembalian"),
+                    rs.getString("status"),
+                    rs.getInt("id_produk"),
+                    rs.getString("sku"),
+                    rs.getInt("kuantitas"),
+                    rs.getString("alasan")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public String requestReturn(int idPengguna, int idTransaksi, int idProduk, String sku, int qty, String alasan) {
+        String sql = "{CALL sp_AjukanRetur(?, ?, ?, ?, ?, ?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idPengguna);
+            cstmt.setInt(2, idTransaksi);
+            cstmt.setInt(3, idProduk);
+            cstmt.setString(4, sku);
+            cstmt.setInt(5, qty);
+            cstmt.setString(6, alasan);
+            cstmt.registerOutParameter(7, java.sql.Types.NVARCHAR);
+            
+            cstmt.execute();
+            return cstmt.getString(7);
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        }
+    }
+
+    public boolean approveReturn(int idRetur, int idValidator) {
+        String sql = "{CALL sp_ProsesRetur(?, ?, ?, ?)}";
+        try (Connection conn = DatabaseConfig.getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, idRetur);
+            cstmt.setBoolean(2, true);
+            cstmt.setInt(3, idValidator);
+            cstmt.registerOutParameter(4, java.sql.Types.NVARCHAR);
+            
+            cstmt.execute();
+            String msg = cstmt.getString(4);
+            return msg != null && msg.startsWith("SUCCESS");
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -88,14 +149,19 @@ public class ReturnModel {
         }
     }
     
-    public boolean rejectReturn(int idRetur) {
-        String sql = "UPDATE retur SET status = 'Rejected' WHERE id_retur = ?";
+    public boolean rejectReturn(int idRetur, int idValidator) {
+        String sql = "{CALL sp_ProsesRetur(?, ?, ?, ?)}";
         try (Connection conn = DatabaseConfig.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             CallableStatement cstmt = conn.prepareCall(sql)) {
             
-            pstmt.setInt(1, idRetur);
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;
+            cstmt.setInt(1, idRetur);
+            cstmt.setBoolean(2, false);
+            cstmt.setInt(3, idValidator);
+            cstmt.registerOutParameter(4, java.sql.Types.NVARCHAR);
+            
+            cstmt.execute();
+            String msg = cstmt.getString(4);
+            return msg != null && msg.startsWith("SUCCESS");
             
         } catch (SQLException e) {
             e.printStackTrace();

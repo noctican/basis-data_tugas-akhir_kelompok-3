@@ -2,6 +2,7 @@ package ui;
 
 import helpers.GUIHelper;
 import models.ReturnModel;
+import session.UserSession;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -25,7 +26,7 @@ public class ReturnAdminPanel extends JPanel {
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.add(new JLabel("Filter Status: "));
         
-        statusCombo = new JComboBox<>(new String[]{"PENDING", "APPROVED", "REJECTED"});
+        statusCombo = new JComboBox<>(new String[]{"Pending", "Success", "Failed"});
         statusCombo.addActionListener(e -> refreshReturns()); 
         filterPanel.add(statusCombo);
         
@@ -64,7 +65,7 @@ public class ReturnAdminPanel extends JPanel {
         List<Object[]> data = returnModel.getReturnsByStatus(selectedStatus);
         for (Object[] row : data) returnModelT.addRow(row);
         
-        boolean isPending = "PENDING".equals(selectedStatus);
+        boolean isPending = "Pending".equals(selectedStatus);
         validateBtn.setEnabled(isPending);
         rejectBtn.setEnabled(isPending);
     }
@@ -77,9 +78,12 @@ public class ReturnAdminPanel extends JPanel {
         }
 
         int returId = Integer.parseInt(returnTable.getValueAt(selectedRow, 0).toString());
-        boolean isUpdated = returnModel.approveReturn(returId); 
+        
+        int validatorId = UserSession.isLoggedIn() ? UserSession.getCurrentUser().getIdPengguna() : 0;
+        boolean isUpdated = returnModel.approveReturn(returId, validatorId); 
+        
         if (isUpdated) {
-            JOptionPane.showMessageDialog(this, "Return ID: " + returId + " Successfully approved! (Status updated to 'APPROVED')", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Return ID: " + returId + " Successfully approved! (Status updated to 'Success')", "Success", JOptionPane.INFORMATION_MESSAGE);
             refreshReturns();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to process return approval.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -97,9 +101,11 @@ public class ReturnAdminPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to reject Return ID: " + returId + "?", "Confirm Reject", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            boolean isRejected = returnModel.rejectReturn(returId);
+            int validatorId = UserSession.isLoggedIn() ? UserSession.getCurrentUser().getIdPengguna() : 0;
+            boolean isRejected = returnModel.rejectReturn(returId, validatorId);
+            
             if (isRejected) {
-                JOptionPane.showMessageDialog(this, "Status Return ID: " + returId + " Successfully updated to 'REJECTED'!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Status Return ID: " + returId + " Successfully updated to 'Failed'!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 refreshReturns();
             } else {
                 JOptionPane.showMessageDialog(this, "Failed to reject return data.", "Error", JOptionPane.ERROR_MESSAGE);

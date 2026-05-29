@@ -273,6 +273,40 @@ public class TransactionModel {
         }
     }
 
+    public List<Object[]> getEligibleReturnItems(int idPengguna) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "SELECT * FROM (" +
+                       "  SELECT t.id_transaksi, p.nama_produk, dt.id_produk, dt.sku, dt.kuantitas, " +
+                       "  (dt.kuantitas - ISNULL((SELECT SUM(dr.kuantitas) FROM detail_retur dr JOIN retur r ON dr.id_retur = r.id_retur WHERE dr.id_transaksi = t.id_transaksi AND dr.id_produk = dt.id_produk AND dr.sku = dt.sku AND r.status <> 'Failed'), 0)) AS sisa_kuantitas " +
+                       "  FROM transaksi t " +
+                       "  JOIN pelanggan_transaksi pt ON t.id_transaksi = pt.id_transaksi " +
+                       "  JOIN detail_transaksi dt ON t.id_transaksi = dt.id_transaksi " +
+                       "  JOIN produk p ON dt.id_produk = p.id_produk " +
+                       "  WHERE pt.id_pengguna = ? AND t.status_pembayaran = 'PAID' " +
+                       ") sub WHERE sisa_kuantitas > 0";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setInt(1, idPengguna);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(new Object[]{
+                    rs.getInt("id_transaksi"),
+                    rs.getString("nama_produk"),
+                    rs.getInt("id_produk"),
+                    rs.getString("sku"),
+                    rs.getInt("kuantitas"),
+                    rs.getInt("sisa_kuantitas")
+                });
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public List<Object[]> getTransactionsByUser(int idPengguna) {
         List<Object[]> list = new ArrayList<>();
         String query = "SELECT t.id_transaksi, t.tanggal_transaksi, t.total_pembelian, " +
