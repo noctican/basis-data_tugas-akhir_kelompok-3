@@ -33,9 +33,9 @@ CREATE TABLE produk (
 	id_sub_kategori INT NOT NULL,
 	nama_produk VARCHAR(255) NOT NULL,
 	deskripsi_produk TEXT,
-	harga_base DECIMAL(19, 4) DEFAULT(0),
-	demografi VARCHAR(255) CHECK(demografi IN ('pria', 'wanita', 'anak', 'equipment')),
-	aktivitas VARCHAR(255),
+	harga_base DECIMAL(19, 2) DEFAULT(0),
+	demografi VARCHAR(255) CHECK(demografi IN ('Pria', 'Wanita', 'Anak', 'Equipment')),
+	aktivitas VARCHAR(255) CHECK(aktivitas IN ('Camping', 'Casual', 'Field Trip', 'Hiking', 'Outdoor', 'Running', 'Tactical', 'Trail Running', 'Traveling', 'Trekking')),
 	CONSTRAINT fk_sub_kategori_produk FOREIGN KEY (id_kategori, id_sub_kategori) REFERENCES sub_kategori(id_kategori, id_sub_kategori),
 );
 GO
@@ -45,7 +45,7 @@ CREATE TABLE varian_produk (
 	sku VARCHAR(10) NOT NULL,
 	stock INT DEFAULT 0,
 	warna VARCHAR(255),
-	harga_varian DECIMAL(19, 4) DEFAULT(0),
+	harga_varian DECIMAL(19, 2) DEFAULT(0),
 	ukuran VARCHAR(255),
 	PRIMARY KEY(id_produk, sku),
 	CONSTRAINT fk_produk_varian_produk FOREIGN KEY (id_produk) REFERENCES produk(id_produk),
@@ -87,14 +87,14 @@ GO
 CREATE TABLE member (
 	jenis VARCHAR(50) PRIMARY KEY,
 	poin INT NOT NULL,
-	voucher_price DECIMAL(19, 4),
-	voucher_percentage DECIMAL(3, 3),
+	voucher_price DECIMAL(19, 2),
+	voucher_percentage DECIMAL(3, 2),
 );
 GO
 
 CREATE TABLE pelanggan (
 	id_pengguna INT PRIMARY KEY,
-	jenis_member VARCHAR(50) DEFAULT('BLUE'),
+	jenis_member VARCHAR(50) DEFAULT('Blue'),
 	tanggal_bergabung DATE DEFAULT(GETDATE()),
 	poin INT DEFAULT(0),
 	wallet DECIMAL(36, 2) NOT NULL DEFAULT(0),
@@ -109,8 +109,8 @@ CREATE TABLE riwayat_topup (
 	id_pengguna INT NOT NULL,
 	id_topup INT IDENTITY(1, 1) NOT NULL,
 	tanggal_topup DATETIME DEFAULT(GETDATE()),
-	nominal DECIMAL(19, 4) DEFAULT(0),
-	status VARCHAR(50) NOT NULL DEFAULT('PENDING'), -- PENDING, SUCCESS, FAILED
+	nominal DECIMAL(19, 2) DEFAULT(0),
+	status VARCHAR(50) NOT NULL DEFAULT('Pending') CHECK(status IN ('Pending', 'Success', 'Failed')),
 	PRIMARY KEY (id_pengguna, id_topup),
 	CONSTRAINT fk_pelanggan_topup FOREIGN KEY (id_pengguna) REFERENCES pelanggan(id_pengguna),
 );
@@ -141,7 +141,7 @@ CREATE TABLE detail_keranjang (
 	id_produk INT,
 	sku VARCHAR(10),
 	kuantitas INT DEFAULT(1),
-	sub_total DECIMAL(19, 4),
+	sub_total DECIMAL(19, 2),
 	PRIMARY KEY(id_keranjang, id_produk, sku),
 	CONSTRAINT fk_keranjang_detail FOREIGN KEY (id_keranjang) REFERENCES keranjang(id_keranjang),
 	CONSTRAINT fk_keranjang_varian_produk FOREIGN KEY (id_produk, sku) REFERENCES varian_produk(id_produk, sku),
@@ -152,8 +152,8 @@ GO
 CREATE TABLE transaksi (
 	id_transaksi INT IDENTITY(1, 1) PRIMARY KEY,
 	tanggal_transaksi DATETIME DEFAULT(GETDATE()),
-	total_pembelian DECIMAL(19, 4) DEFAULT(0),
-	status_pembayaran VARCHAR(100) DEFAULT('PENDING'),
+	total_pembelian DECIMAL(19, 2) DEFAULT(0),
+	status_pembayaran VARCHAR(100) DEFAULT('Pending') CHECK (status_pembayaran in ('Pending', 'Paid', 'Failed')),
 	metode_pembayaran VARCHAR(255),
 );
 GO
@@ -171,7 +171,7 @@ CREATE TABLE detail_transaksi (
 	id_produk INT NOT NULL,
 	sku VARCHAR(10) NOT NULL,
 	id_transaksi INT NOT NULL,
-	harga_pembelian DECIMAL(19, 4) DEFAULT(0),
+	harga_pembelian DECIMAL(19, 2) DEFAULT(0),
 	kuantitas INT DEFAULT(1),
 	PRIMARY KEY(id_transaksi, id_produk, sku),
 	CONSTRAINT fk_transaksi_detail_transaksi FOREIGN KEY (id_transaksi) REFERENCES transaksi(id_transaksi),
@@ -184,7 +184,7 @@ CREATE TABLE retur (
 	id_retur INT IDENTITY(1, 1),
 	id_transaksi INT,
 	tanggal_pengembalian DATE DEFAULT(GETDATE()),
-	status VARCHAR(100) DEFAULT('PENDING'),
+	status VARCHAR(100) DEFAULT('Pending') CHECK (status in ('Success', 'Pending', 'Failed')),
 	id_validator INT,
 	PRIMARY KEY (id_retur),
 	CONSTRAINT fk_transaksi_retur FOREIGN KEY (id_transaksi) REFERENCES transaksi(id_transaksi),
@@ -215,8 +215,8 @@ CREATE TABLE pengiriman (
 	no_telp VARCHAR(20),
 	kode_pos INT,
 	provinsi VARCHAR(255),
-	status_pengiriman VARCHAR(255) DEFAULT('PROSES'),
-	biaya_pengiriman DECIMAL(19, 4) DEFAULT(0),
+	status_pengiriman VARCHAR(255) DEFAULT('Process') CHECK(status_pengiriman IN ('Process', 'Delivered', 'Completed', 'Canceled')),
+	biaya_pengiriman DECIMAL(19, 2) DEFAULT(0),
 	tanggal_pengiriman DATETIME DEFAULT(GETDATE()),
 	PRIMARY KEY(id_transaksi, no_resi),
 	CONSTRAINT fk_transaksi_pengiriman FOREIGN KEY(id_transaksi) REFERENCES transaksi(id_transaksi),
