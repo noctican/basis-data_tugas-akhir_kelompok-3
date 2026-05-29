@@ -2,6 +2,7 @@ package ui;
 
 import entities.Transaksi;
 import helpers.GUIHelper;
+import helpers.NumberHelper;
 import models.OrderModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -27,6 +28,9 @@ public class OrderAdminPanel extends JPanel {
         
         orderTable = new JTable(orderModelT);
         orderTable.getTableHeader().setReorderingAllowed(false);
+        
+        NumberHelper.setRupiah(orderTable, 2);
+        
         add(new JScrollPane(orderTable), BorderLayout.CENTER);
 
         JButton shipBtn = new JButton("Mark as Shipped");
@@ -43,7 +47,7 @@ public class OrderAdminPanel extends JPanel {
             orderModelT.addRow(new Object[]{
                 t.getIdTransaksi(), 
                 t.getTanggalTransaksi(), 
-                t.getTotalPembelian(), 
+                t.getTotalPembelian(),
                 t.getStatusPembayaran(), 
                 t.getMetodePembayaran()
             });

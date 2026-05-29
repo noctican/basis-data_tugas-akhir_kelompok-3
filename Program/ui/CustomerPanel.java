@@ -2,6 +2,7 @@ package ui;
 
 import entities.*;
 import helpers.GUIHelper;
+import helpers.NumberHelper;
 import models.UserModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -69,6 +70,9 @@ public class CustomerPanel extends JPanel {
         };
         memberTable = new JTable(memberModel);
         memberTable.getTableHeader().setReorderingAllowed(false);
+        
+        NumberHelper.setRupiah(memberTable, 2);
+        
         memberPanel.add(new JScrollPane(memberTable), BorderLayout.CENTER);
 
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
@@ -117,7 +121,7 @@ public class CustomerPanel extends JPanel {
             memberModel.addRow(new Object[]{
                 m.getJenis(), 
                 m.getPoin(), 
-                m.getVoucherPrice(), 
+                m.getVoucherPrice(),
                 m.getVoucherPercentage()
             });
         }
@@ -276,7 +280,9 @@ public class CustomerPanel extends JPanel {
                 Member m = new Member();
                 m.setJenis(jenisF.getText().trim());
                 m.setPoin(Integer.parseInt(poinF.getText().trim()));
-                m.setVoucherPrice(new java.math.BigDecimal(priceF.getText().trim()));
+                
+                m.setVoucherPrice(NumberHelper.parseRupiahToBigDecimal(priceF.getText().trim()));
+                
                 m.setVoucherPercentage(new java.math.BigDecimal(percentF.getText().trim()));
 
                 if (userModel.addMember(m)) {
@@ -305,6 +311,8 @@ public class CustomerPanel extends JPanel {
 
         String currentJenis = (String) memberModel.getValueAt(row, 0);
         int currentPoin = (int) memberModel.getValueAt(row, 1);
+        
+        // Data yang ditarik tetap aman berupa BigDecimal karena kita pakai Renderer
         java.math.BigDecimal currentPrice = (java.math.BigDecimal) memberModel.getValueAt(row, 2);
         java.math.BigDecimal currentPercent = (java.math.BigDecimal) memberModel.getValueAt(row, 3);
 
@@ -315,6 +323,7 @@ public class CustomerPanel extends JPanel {
         JTextField jenisF = new JTextField(currentJenis);
         jenisF.setEditable(false); 
         JTextField poinF = new JTextField(String.valueOf(currentPoin));
+        
         JTextField priceF = new JTextField(currentPrice.toString());
         JTextField percentF = new JTextField(currentPercent.toString());
 
@@ -329,7 +338,9 @@ public class CustomerPanel extends JPanel {
                 Member m = new Member();
                 m.setJenis(currentJenis);
                 m.setPoin(Integer.parseInt(poinF.getText().trim()));
-                m.setVoucherPrice(new java.math.BigDecimal(priceF.getText().trim()));
+                
+                m.setVoucherPrice(NumberHelper.parseRupiahToBigDecimal(priceF.getText().trim()));
+                
                 m.setVoucherPercentage(new java.math.BigDecimal(percentF.getText().trim()));
 
                 if (userModel.updateMember(m)) {

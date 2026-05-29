@@ -2,6 +2,7 @@ package ui;
 
 import entities.*;
 import helpers.GUIHelper;
+import helpers.NumberHelper;
 import models.CatalogModel;
 import models.TransactionModel;
 import models.ProductAnalysisModel;
@@ -51,6 +52,9 @@ public class ShopPanel extends JPanel {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         productTable = new JTable(productModel);
+        productTable.getTableHeader().setReorderingAllowed(false);
+
+        NumberHelper.setRupiah(productTable, 2);
 
         productTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -65,7 +69,6 @@ public class ShopPanel extends JPanel {
         JPanel containerBottom = new JPanel();
         containerBottom.setLayout(new BoxLayout(containerBottom, BoxLayout.Y_AXIS));
 
-        // 6. BUAT PANEL REKOMENDASI (Frequently Bought Together)
         JPanel recPanel = new JPanel(new BorderLayout());
         recPanel.setBorder(BorderFactory.createTitledBorder("Frequently Bought Together"));
         
@@ -94,7 +97,6 @@ public class ShopPanel extends JPanel {
         try {
             int idProduk = (int) productModel.getValueAt(row, 0);
             
-            // Panggil query via model Java
             List<Object[]> recs = analysisModel.getTop3ProductsBoughtTogether(idProduk);
 
             if (recs.isEmpty()) {
@@ -116,7 +118,14 @@ public class ShopPanel extends JPanel {
     private void refreshProducts() {
         productModel.setRowCount(0);
         List<Produk> list = catalogModel.searchProduk(searchField.getText());
-        for (Produk p : list) productModel.addRow(new Object[]{p.getIdProduk(), p.getNamaProduk(), p.getHargaBase(), p.getDeskripsiProduk()});
+        for (Produk p : list) {
+            productModel.addRow(new Object[]{
+                p.getIdProduk(), 
+                p.getNamaProduk(), 
+                p.getHargaBase(),
+                p.getDeskripsiProduk()
+            });
+        }
 
         if (recommendationLabel != null) {
             recommendationLabel.setText("<html><i style='color:gray;'>Select a product to see recommendation bundles...</i></html>");
@@ -153,5 +162,3 @@ public class ShopPanel extends JPanel {
         }
     }
 }
-
-

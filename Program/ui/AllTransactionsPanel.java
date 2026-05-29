@@ -2,6 +2,7 @@ package ui;
 
 import entities.Transaksi;
 import helpers.GUIHelper;
+import helpers.NumberHelper;
 import models.OrderModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -47,6 +48,10 @@ public class AllTransactionsPanel extends JPanel {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         transTable = new JTable(transModel);
+        transTable.getTableHeader().setReorderingAllowed(false);
+        
+        NumberHelper.setRupiah(transTable, 2);
+        
         add(new JScrollPane(transTable), BorderLayout.CENTER);
     }
 
@@ -55,7 +60,13 @@ public class AllTransactionsPanel extends JPanel {
         String selectedStatus = (String) statusFilter.getSelectedItem();
         List<Transaksi> list = orderModel.getAllOrdersFiltered(selectedStatus);
         for (Transaksi t : list) {
-            transModel.addRow(new Object[]{t.getIdTransaksi(), t.getTanggalTransaksi(), t.getTotalPembelian(), t.getStatusPembayaran(), t.getMetodePembayaran()});
+            transModel.addRow(new Object[]{
+                t.getIdTransaksi(), 
+                t.getTanggalTransaksi(), 
+                t.getTotalPembelian(),
+                t.getStatusPembayaran(), 
+                t.getMetodePembayaran()
+            });
         }
     }
 }

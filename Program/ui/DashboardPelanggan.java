@@ -2,6 +2,7 @@ package ui;
 
 import entities.Pelanggan;
 import entities.Pengguna;
+import helpers.NumberHelper;
 import models.TransactionModel;
 import models.UserModel;
 import session.UserSession;
@@ -43,6 +44,10 @@ public class DashboardPelanggan extends JPanel {
         };
         
         topProductsTable = new JTable(tableModel);
+        topProductsTable.getTableHeader().setReorderingAllowed(false);
+        
+        NumberHelper.setRupiah(topProductsTable, 3);
+        
         JScrollPane scrollPane = new JScrollPane(topProductsTable);
         scrollPane.setPreferredSize(new Dimension(500, 150)); 
         

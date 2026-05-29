@@ -2,13 +2,16 @@ package ui;
 
 import entities.*;
 import helpers.GUIHelper;
+import helpers.NumberHelper; 
 import models.TransactionModel;
 import session.UserSession;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class CartPanel extends JPanel {
     private TransactionModel transactionModel;
@@ -16,6 +19,8 @@ public class CartPanel extends JPanel {
     private DefaultTableModel cartModel;
     private JLabel totalLabel;
     private Keranjang currentCart;
+    
+    private final NumberFormat rupiahFmt = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
 
     public CartPanel() {
         transactionModel = new TransactionModel();
@@ -33,12 +38,16 @@ public class CartPanel extends JPanel {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         cartTable = new JTable(cartModel);
+        cartTable.getTableHeader().setReorderingAllowed(false);
+
+        NumberHelper.setRupiah(cartTable, 3);
+
         add(new JScrollPane(cartTable), BorderLayout.CENTER);
     }
 
     private void setupBottomPanel() {
         JPanel bottom = new JPanel(new BorderLayout());
-        totalLabel = new JLabel("Total: 0");
+        totalLabel = new JLabel("Total: Rp 0");
         totalLabel.setFont(new Font("Arial", Font.BOLD, 16));
         bottom.add(totalLabel, BorderLayout.WEST);
 
@@ -61,7 +70,6 @@ public class CartPanel extends JPanel {
     }
 
     public void refreshCart() {
-        // Otomatis bersihkan transaksi expired (>10 menit) di DB sebelum merender ulang halaman belanja
         transactionModel.cekExpiredPembayaran();
 
         cartModel.setRowCount(0);
@@ -69,10 +77,15 @@ public class CartPanel extends JPanel {
         List<DetailKeranjang> items = transactionModel.getCartDetails(currentCart.getIdKeranjang());
         BigDecimal total = BigDecimal.ZERO;
         for (DetailKeranjang d : items) {
-            cartModel.addRow(new Object[]{d.getIdProduk(), d.getSku(), d.getKuantitas(), d.getSubTotal()});
+            cartModel.addRow(new Object[]{
+                d.getIdProduk(), 
+                d.getSku(), 
+                d.getKuantitas(), 
+                d.getSubTotal()
+            });
             total = total.add(d.getSubTotal());
         }
-        totalLabel.setText("Total: Rp " + total.toString());
+        totalLabel.setText("Total: " + rupiahFmt.format(total));
     }
 
     private void handleCheckout() {
@@ -81,49 +94,41 @@ public class CartPanel extends JPanel {
             return; 
         }
 
-        // 1. Pilih metode pembayaran (Sesuai parameter sp_Checkout_Reservasi_HapusKeranjang)
         String[] methods = {"Wallet"};
         String selectedMethod = (String) JOptionPane.showInputDialog(
                 this, "Select Payment Method:", "Checkout Confirmation", 
                 JOptionPane.QUESTION_MESSAGE, null, methods, methods[0]
         );
         
-        if (selectedMethod == null) return; // User cancel dialog pemilihan metode
+        if (selectedMethod == null) return;
 
         int currentUserId = UserSession.getCurrentUser().getIdPengguna();
         StringBuilder errorBuffer = new StringBuilder();
 
-        // 2. Eksekusi Stored Procedure Tahap 1: Membuat Transaksi PENDING & Mengosongkan Keranjang
         int newTransactionId = transactionModel.checkoutReservasi(currentUserId, selectedMethod, errorBuffer);
 
         if (newTransactionId > 0) {
-            // Berhasil reservasi stok dan membuat ID transaksi baru
             JOptionPane.showMessageDialog(this, 
                     "Checkout Sukses!\nID Transaksi Anda: #" + newTransactionId + 
                     "\nStatus: PENDING\n\nCatatan: Selesaikan pembayaran dalam waktu 10 menit atau pesanan otomatis dibatalkan.", 
                     "Informasi Transaksi", JOptionPane.INFORMATION_MESSAGE);
             
-            // Refresh tabel keranjang (sekarang harusnya sudah kosong karena dihapus oleh SP)
             refreshCart();
 
-            // 3. Eksekusi Stored Procedure Tahap 2: Menawarkan pembayaran instan menggunakan Wallet
             int payConfirm = JOptionPane.showConfirmDialog(this, 
                     "Apakah Anda ingin langsung membayar Transaksi #" + newTransactionId + " menggunakan Saldo Wallet?", 
                     "Bayar Sekarang", JOptionPane.YES_NO_OPTION);
 
             if (payConfirm == JOptionPane.YES_OPTION) {
-                // Menjalankan sp_BayarTransaksi
                 String hasilPembayaran = transactionModel.bayarTransaksi(currentUserId, newTransactionId);
                 
                 if (hasilPembayaran.startsWith("SUKSES")) {
                     JOptionPane.showMessageDialog(this, hasilPembayaran, "Pembayaran Berhasil", JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    // Menampilkan pesan error spesifik dari kembalian RAISERROR / OUTPUT SP (Misal: Saldo kurang, dsb)
                     JOptionPane.showMessageDialog(this, hasilPembayaran, "Pembayaran Gagal", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
-            // Gagal karena validasi internal SP (misal: stok mendadak tidak cukup)
             GUIHelper.showError(this, "Checkout Gagal: " + errorBuffer.toString());
         }
     }

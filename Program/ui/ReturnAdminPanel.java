@@ -11,8 +11,6 @@ public class ReturnAdminPanel extends JPanel {
     private ReturnModel returnModel;
     private JTable returnTable;
     private DefaultTableModel returnModelT;
-    
-    // Memindahkan komponen filter & aksi ke variabel kelas
     private JComboBox<String> statusCombo;
     private JButton validateBtn;
     private JButton rejectBtn;
@@ -21,23 +19,19 @@ public class ReturnAdminPanel extends JPanel {
         returnModel = new ReturnModel();
         setLayout(new BorderLayout());
 
-        // 1. Membuat Panel Atas (Header + Dropdown Filter)
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(GUIHelper.createContentHeader("Returns Validation"), BorderLayout.NORTH);
 
         JPanel filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         filterPanel.add(new JLabel("Filter Status: "));
         
-        // Item dropdown disesuaikan dengan nilai konkrit string pada DDL/DML
         statusCombo = new JComboBox<>(new String[]{"PENDING", "APPROVED", "REJECTED"});
-        // Otomatis refresh tabel setiap kali pilihan dropdown berubah
         statusCombo.addActionListener(e -> refreshReturns()); 
         filterPanel.add(statusCombo);
         
         topPanel.add(filterPanel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
-        // 2. Membuat Tabel Konten (Center)
         returnModelT = new DefaultTableModel(new String[]{"Retur ID", "Trx ID", "Product ID", "SKU", "Qty", "Reason"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -45,7 +39,6 @@ public class ReturnAdminPanel extends JPanel {
         returnTable = new JTable(returnModelT);
         add(new JScrollPane(returnTable), BorderLayout.CENTER);
 
-        // 3. Membuat Panel Tombol Aksi (South)
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         validateBtn = new JButton("Validate & Approve");
@@ -61,22 +54,16 @@ public class ReturnAdminPanel extends JPanel {
         buttonPanel.add(refreshBtn);
 
         add(buttonPanel, BorderLayout.SOUTH);
-
-        // Load data pertama kali
         refreshReturns();
     }
     
     private void refreshReturns() {
         returnModelT.setRowCount(0);
-        
-        // Mengambil status yang sedang dipilih dari dropdown ("PENDING", "disetujui", atau "ditolak")
         String selectedStatus = (String) statusCombo.getSelectedItem();
         
-        // Memanggil fungsi baru di model yang menerima parameter status
         List<Object[]> data = returnModel.getReturnsByStatus(selectedStatus);
         for (Object[] row : data) returnModelT.addRow(row);
-
-        // FITUR KEAMANAN UI: Tombol Approve & Reject hanya aktif jika data berstatus 'PENDING'
+        
         boolean isPending = "PENDING".equals(selectedStatus);
         validateBtn.setEnabled(isPending);
         rejectBtn.setEnabled(isPending);

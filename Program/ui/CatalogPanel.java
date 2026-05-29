@@ -2,8 +2,10 @@ package ui;
 
 import entities.*;
 import helpers.GUIHelper;
+import helpers.NumberHelper;
 import models.CatalogModel;
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
@@ -48,6 +50,16 @@ public class CatalogPanel extends JPanel {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         productTable = new JTable(productTableModel);
+        productTable.getColumnModel().getColumn(2).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public void setValue(Object value) {
+                if (value instanceof Number) {
+                    value = NumberHelper.formatNumber(((Number) value).doubleValue(), true, true);
+                }
+                super.setValue(value);
+            }
+        });
+        
         add(new JScrollPane(productTable), BorderLayout.CENTER);
     }
 
@@ -137,7 +149,7 @@ public class CatalogPanel extends JPanel {
         }
     }
 
-private void showCategoryManager() {
+    private void showCategoryManager() {
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Manage Categories & Sub-Categories", true);
         dialog.setSize(550, 400);
         dialog.setLayout(new BorderLayout(10, 10));
@@ -439,7 +451,17 @@ private void showCategoryManager() {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         JTable varTable = new JTable(varModel);
-        
+        varTable.getColumnModel().getColumn(3).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public void setValue(Object value) {
+                if (value instanceof Number) {
+                    // Menyulap angka menjadi format Rp saat ditampilkan
+                    value = NumberHelper.formatNumber(((Number) value).doubleValue(), true, true);
+                }
+                super.setValue(value);
+            }
+        });
+
         dialog.add(new JScrollPane(varTable), BorderLayout.CENTER);
 
         Runnable refreshVarians = () -> {

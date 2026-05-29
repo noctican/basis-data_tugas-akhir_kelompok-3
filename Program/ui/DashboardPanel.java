@@ -57,7 +57,7 @@ public class DashboardPanel extends JPanel {
 
         JPanel inputPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         inputPanel.add(new JLabel("Target Product ID:"));
-        txtProductIdTarget = new JTextField("9", 5); // Default value contoh id=9
+        txtProductIdTarget = new JTextField("9", 5);
         btnAnalyzeTarget = new JButton("Analyze");
         inputPanel.add(txtProductIdTarget);
         inputPanel.add(btnAnalyzeTarget);

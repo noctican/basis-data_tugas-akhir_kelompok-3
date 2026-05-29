@@ -2,6 +2,7 @@ package ui;
 
 import entities.RiwayatTopup;
 import helpers.GUIHelper;
+import helpers.NumberHelper;
 import models.UserModel;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -48,6 +49,10 @@ public class TopupAdminPanel extends JPanel {
             public boolean isCellEditable(int row, int column) { return false; }
         };
         topupTable = new JTable(topupModel);
+        topupTable.getTableHeader().setReorderingAllowed(false);
+        
+        NumberHelper.setRupiah(topupTable, 3);
+        
         add(new JScrollPane(topupTable), BorderLayout.CENTER);
     }
 
@@ -79,7 +84,13 @@ public class TopupAdminPanel extends JPanel {
         String selectedStatus = (String) statusFilter.getSelectedItem();
         List<RiwayatTopup> list = userModel.getAllTopupsFiltered(selectedStatus);
         for (RiwayatTopup r : list) {
-            topupModel.addRow(new Object[]{r.getIdPengguna(), r.getIdTopup(), r.getTanggalTopup(), r.getNominal(), r.getStatus()});
+            topupModel.addRow(new Object[]{
+                r.getIdPengguna(), 
+                r.getIdTopup(), 
+                r.getTanggalTopup(), 
+                r.getNominal(),
+                r.getStatus()
+            });
         }
     }
 

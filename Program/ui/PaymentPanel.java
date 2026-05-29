@@ -1,6 +1,7 @@
 package ui;
 
 import helpers.GUIHelper;
+import helpers.NumberHelper; // <-- IMPORT JURUSNYA DI SINI
 import models.PaymentModel;
 import models.PaymentModel.HasilPembayaran;
 import session.UserSession;
@@ -19,16 +20,6 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * PaymentPanel – Panel GUI Pembayaran Wallet
- *
- * Fitur:
- *  - Daftar transaksi PENDING milik pelanggan + countdown 10 menit
- *  - Tombol "Bayar Sekarang" → memanggil sp_BayarTransaksi
- *  - Tombol "Batalkan"       → memanggil sp_GagalkanPembayaran
- *  - Status badge berwarna: PENDING (oranye), PAID (hijau), FAILED (merah)
- *  - Timer tiap 5 detik: refresh tabel + jalankan sp_CekExpiredPembayaran
- */
 public class PaymentPanel extends JPanel {
 
     private static final int BATAS_MENIT    = 10;
@@ -46,7 +37,6 @@ public class PaymentPanel extends JPanel {
     private final SimpleDateFormat dateFmt =
             new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-    // --- Komponen UI ---
     private JTable tabel;
     private DefaultTableModel tabelModel;
 
@@ -59,7 +49,6 @@ public class PaymentPanel extends JPanel {
 
     private Timer autoRefreshTimer;
 
-    // Kolom tabel
     private static final String[] KOLOM = {
         "ID Transaksi", "Tanggal", "Total (Rp)", "Metode", "Status", "Sisa Waktu"
     };
@@ -77,9 +66,6 @@ public class PaymentPanel extends JPanel {
         refresh();
     }
 
-    // ================================================================
-    // HEADER – info wallet + judul
-    // ================================================================
     private JPanel buatHeader() {
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(WARNA_BG);
@@ -104,9 +90,6 @@ public class PaymentPanel extends JPanel {
         return header;
     }
 
-    // ================================================================
-    // TENGAH – tabel transaksi
-    // ================================================================
     private JPanel buatTengah() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setBackground(WARNA_BG);
@@ -121,11 +104,14 @@ public class PaymentPanel extends JPanel {
         tabel = new JTable(tabelModel);
         tabel.setRowHeight(28);
         tabel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabel.getTableHeader().setReorderingAllowed(false);
+
+        NumberHelper.setRupiah(tabel, 2);
+
         tabel.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) updateDetailBar();
         });
 
-        // Renderer warna status
         tabel.getColumnModel().getColumn(4).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
@@ -146,7 +132,6 @@ public class PaymentPanel extends JPanel {
             }
         });
 
-        // Renderer warna sisa waktu
         tabel.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(
@@ -168,7 +153,6 @@ public class PaymentPanel extends JPanel {
             }
         });
 
-        // Lebar kolom
         int[] lebar = {100, 150, 140, 120, 90, 110};
         for (int i = 0; i < lebar.length; i++)
             tabel.getColumnModel().getColumn(i).setPreferredWidth(lebar[i]);
@@ -177,21 +161,16 @@ public class PaymentPanel extends JPanel {
         return panel;
     }
 
-    // ================================================================
-    // BAWAH – detail + tombol aksi
-    // ================================================================
     private JPanel buatBawah() {
         JPanel panel = new JPanel(new BorderLayout(10, 5));
         panel.setBackground(WARNA_BG);
         panel.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
 
-        // Info baris dipilih
         lblStatusDetail = new JLabel("Pilih transaksi untuk membayar atau membatalkan.");
         lblStatusDetail.setFont(new Font("Arial", Font.ITALIC, 12));
         lblStatusDetail.setForeground(Color.DARK_GRAY);
         panel.add(lblStatusDetail, BorderLayout.CENTER);
 
-        // Tombol
         JPanel tombolPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         tombolPanel.setBackground(WARNA_BG);
 
@@ -218,15 +197,8 @@ public class PaymentPanel extends JPanel {
         return panel;
     }
 
-    // ================================================================
-    // REFRESH DATA
-    // ================================================================
     private void refresh() {
-        // 1. Jalankan SP expire dulu
         int expired = paymentModel.cekExpiredPembayaran();
-        // expired == 0 → tidak ada, > 0 → ada yang di-expire, -1 → error
-
-        // 2. Load data transaksi
         int idPengguna = UserSession.getCurrentUser().getIdPengguna();
         List<Object[]> rows = paymentModel.getTransaksiPelanggan(idPengguna);
 
@@ -234,7 +206,6 @@ public class PaymentPanel extends JPanel {
         BigDecimal walletTerbaru = BigDecimal.ZERO;
 
         for (Object[] row : rows) {
-            // row: [id, timestamp, total, status, metode, detikBerlalu]
             int    id          = (int)       row[0];
             Timestamp tgl      = (Timestamp) row[1];
             BigDecimal total   = (BigDecimal)row[2];
@@ -261,16 +232,14 @@ public class PaymentPanel extends JPanel {
             tabelModel.addRow(new Object[]{
                 id,
                 dateFmt.format(tgl),
-                rupiahFmt.format(total),
+                total,
                 metode,
                 status,
                 sisaWaktu
             });
         }
 
-        // Update saldo wallet (ambil dari baris pertama yang PENDING atau saja query ulang)
         if (!rows.isEmpty()) {
-            // Ambil wallet dari info transaksi pertama
             Object[] info = paymentModel.getInfoTransaksi(
                     (int) rows.get(0)[0], idPengguna);
             if (info != null && info[6] != null) {
@@ -281,7 +250,6 @@ public class PaymentPanel extends JPanel {
 
         updateDetailBar();
 
-        // Notifikasi jika ada yang baru di-expire
         if (expired > 0) {
             JOptionPane.showMessageDialog(this,
                 expired + " transaksi PENDING yang melebihi batas waktu 10 menit\n" +
@@ -301,7 +269,8 @@ public class PaymentPanel extends JPanel {
 
         String status   = (String) tabelModel.getValueAt(row, 4);
         String sisaWaktu = (String) tabelModel.getValueAt(row, 5);
-        String total    = (String) tabelModel.getValueAt(row, 2);
+        BigDecimal totalVal = (BigDecimal) tabelModel.getValueAt(row, 2);
+        String total    = rupiahFmt.format(totalVal); 
         int    id       = (int)    tabelModel.getValueAt(row, 0);
 
         boolean isPending   = "PENDING".equals(status);
@@ -319,15 +288,13 @@ public class PaymentPanel extends JPanel {
         }
     }
 
-    // ================================================================
-    // HANDLER BAYAR
-    // ================================================================
     private void handleBayar() {
         int row = tabel.getSelectedRow();
         if (row == -1) return;
 
         int    idTransaksi = (int)    tabelModel.getValueAt(row, 0);
-        String total       = (String) tabelModel.getValueAt(row, 2);
+        BigDecimal totalVal   = (BigDecimal) tabelModel.getValueAt(row, 2);
+        String total       = rupiahFmt.format(totalVal);
         int    idPengguna  = UserSession.getCurrentUser().getIdPengguna();
 
         boolean konfirmasi = GUIHelper.confirm(this,
@@ -350,9 +317,6 @@ public class PaymentPanel extends JPanel {
         refresh();
     }
 
-    // ================================================================
-    // HANDLER BATALKAN
-    // ================================================================
     private void handleBatal() {
         int row = tabel.getSelectedRow();
         if (row == -1) return;
@@ -376,21 +340,15 @@ public class PaymentPanel extends JPanel {
         refresh();
     }
 
-    // ================================================================
-    // AUTO-REFRESH TIMER (setiap 5 detik)
-    // ================================================================
     private void mulaiAutoRefresh() {
         autoRefreshTimer = new Timer(true);
         autoRefreshTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                // Harus lewat EDT untuk update UI
                 SwingUtilities.invokeLater(() -> refresh());
             }
         }, REFRESH_MS, REFRESH_MS);
     }
-
-    /** Panggil ini saat panel ditutup / di-navigate away */
     public void stopTimer() {
         if (autoRefreshTimer != null) autoRefreshTimer.cancel();
     }
