@@ -73,7 +73,7 @@ public class PaymentModel {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            return -1; // -1 = error
+            return -1;
         }
     }
 

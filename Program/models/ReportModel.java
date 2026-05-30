@@ -29,31 +29,31 @@ public class ReportModel {
     }
 
     public List<Object[]> getTop5SpendingCustomers() {
-    List<Object[]> list = new ArrayList<>();
-    String query = "EXEC sp_get_top_5_spending_customers ?";
-    
-    try (Connection conn = DatabaseConfig.getConnection(); 
-         PreparedStatement ps = conn.prepareStatement(query)) {
+        List<Object[]> list = new ArrayList<>();
+        String query = "EXEC sp_get_top_5_spending_customers ?";
         
-        ps.setNull(1, java.sql.Types.DATE); 
-        
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                String namaPelanggan = rs.getString("full_name");
-                double totalBelanja = rs.getDouble("total_spend");
-                
-                String hargaFormatRp = NumberHelper.formatNumber(totalBelanja, true, true);
-                list.add(new Object[]{
-                    namaPelanggan,
-                    hargaFormatRp
-                });
+        try (Connection conn = DatabaseConfig.getConnection(); 
+            PreparedStatement ps = conn.prepareStatement(query)) {
+            
+            ps.setNull(1, java.sql.Types.DATE); 
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String namaPelanggan = rs.getString("full_name");
+                    double totalBelanja = rs.getDouble("total_spend");
+                    
+                    String hargaFormatRp = NumberHelper.formatNumber(totalBelanja, true, true);
+                    list.add(new Object[]{
+                        namaPelanggan,
+                        hargaFormatRp
+                    });
+                }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
+        return list;
     }
-    return list;
-}
 
     public List<Object[]> getFrequentlyBoughtTogether(int idProduk) {
         List<Object[]> list = new ArrayList<>();

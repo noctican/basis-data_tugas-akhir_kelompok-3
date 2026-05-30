@@ -312,7 +312,6 @@ public class CustomerPanel extends JPanel {
         String currentJenis = (String) memberModel.getValueAt(row, 0);
         int currentPoin = (int) memberModel.getValueAt(row, 1);
         
-        // Data yang ditarik tetap aman berupa BigDecimal karena kita pakai Renderer
         java.math.BigDecimal currentPrice = (java.math.BigDecimal) memberModel.getValueAt(row, 2);
         java.math.BigDecimal currentPercent = (java.math.BigDecimal) memberModel.getValueAt(row, 3);
 

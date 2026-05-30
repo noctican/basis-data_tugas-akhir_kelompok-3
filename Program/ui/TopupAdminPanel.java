@@ -63,12 +63,12 @@ public class TopupAdminPanel extends JPanel {
         refreshBtn.addActionListener(e -> refreshTopups());
 
         JButton approveBtn = new JButton("Approve");
-        approveBtn.setBackground(new Color(40, 167, 69)); // Success green
+        approveBtn.setBackground(new Color(40, 167, 69));
         approveBtn.setForeground(Color.WHITE);
         approveBtn.addActionListener(e -> handleProcessTopup(true));
 
         JButton rejectBtn = new JButton("Reject");
-        rejectBtn.setBackground(new Color(220, 53, 69)); // Danger red
+        rejectBtn.setBackground(new Color(220, 53, 69));
         rejectBtn.setForeground(Color.WHITE);
         rejectBtn.addActionListener(e -> handleProcessTopup(false));
 

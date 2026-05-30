@@ -455,7 +455,6 @@ public class CatalogPanel extends JPanel {
             @Override
             public void setValue(Object value) {
                 if (value instanceof Number) {
-                    // Menyulap angka menjadi format Rp saat ditampilkan
                     value = NumberHelper.formatNumber(((Number) value).doubleValue(), true, true);
                 }
                 super.setValue(value);
