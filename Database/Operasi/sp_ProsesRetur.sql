@@ -15,7 +15,6 @@ BEGIN
     DECLARE @id_pengguna INT;
     DECLARE @refund_total DECIMAL(36,2) = 0;
 
-    -- Get current status and transaction info
     SELECT @status = status, @id_transaksi = id_transaksi
     FROM retur
     WHERE id_retur = @id_retur;
@@ -26,7 +25,6 @@ BEGIN
         RETURN;
     END
 
-    -- Ensure we only process 'Pending' returns
     IF @status <> 'Pending'
     BEGIN
         SET @msg_response = 'ERROR: Return request has already been processed (Current status: ' + @status + ').';
@@ -38,7 +36,6 @@ BEGIN
 
         IF @is_approve = 0
         BEGIN
-            -- Reject return
             UPDATE retur
             SET status = 'Failed',
                 id_validator = ISNULL(@id_validator, id_validator)
@@ -48,18 +45,15 @@ BEGIN
         END
         ELSE
         BEGIN
-            -- Approve return
             UPDATE retur
             SET status = 'Success',
                 id_validator = ISNULL(@id_validator, id_validator)
             WHERE id_retur = @id_retur;
 
-            -- Find the user who made the transaction
             SELECT @id_pengguna = id_pengguna
             FROM pelanggan_transaksi
             WHERE id_transaksi = @id_transaksi;
 
-            -- Calculate total refund amount from returned details
             SELECT @refund_total = ISNULL(SUM(dr.kuantitas * dt.harga_pembelian), 0)
             FROM detail_retur dr
             JOIN detail_transaksi dt ON dr.id_transaksi = dt.id_transaksi 
@@ -67,7 +61,6 @@ BEGIN
                                     AND dr.sku = dt.sku
             WHERE dr.id_retur = @id_retur;
 
-            -- Refund the user's wallet
             IF @refund_total > 0 AND @id_pengguna IS NOT NULL
             BEGIN
                 UPDATE pelanggan
@@ -75,7 +68,6 @@ BEGIN
                 WHERE id_pengguna = @id_pengguna;
             END
 
-            -- Return stock to varian_produk
             UPDATE vp
             SET vp.stock = vp.stock + dr.kuantitas
             FROM varian_produk vp

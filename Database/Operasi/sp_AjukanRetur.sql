@@ -18,7 +18,6 @@ BEGIN
     DECLARE @qty_beli INT;
     DECLARE @qty_sudah_retur INT;
 
-    -- 1. Validasi Kepemilikan Transaksi dan Statusnya
     SELECT @status_transaksi = t.status_pembayaran
     FROM transaksi t
     JOIN pelanggan_transaksi pt ON t.id_transaksi = pt.id_transaksi
@@ -36,7 +35,6 @@ BEGIN
         RETURN;
     END
 
-    -- 2. Validasi Produk pada Transaksi
     SELECT @qty_beli = kuantitas
     FROM detail_transaksi
     WHERE id_transaksi = @id_transaksi AND id_produk = @id_produk AND sku = @sku;
@@ -53,7 +51,6 @@ BEGIN
         RETURN;
     END
 
-    -- Cek jika sudah pernah diretur (total kuantitas retur)
     SELECT @qty_sudah_retur = ISNULL(SUM(dr.kuantitas), 0)
     FROM detail_retur dr
     JOIN retur r ON dr.id_retur = r.id_retur
@@ -68,13 +65,11 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        -- 3. Insert ke retur
         INSERT INTO retur (id_transaksi, status)
         VALUES (@id_transaksi, 'Pending');
         
         SET @id_retur = SCOPE_IDENTITY();
 
-        -- 4. Insert ke detail_retur
         INSERT INTO detail_retur (id_transaksi, id_retur, id_produk, sku, kuantitas, alasan)
         VALUES (@id_transaksi, @id_retur, @id_produk, @sku, @kuantitas, @alasan);
 
