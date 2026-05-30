@@ -30,7 +30,6 @@ BEGIN
         RETURN;
     END
 
-    -- 2. Harus PENDING
     IF @status <> 'PENDING'
     BEGIN
         SET @hasil_pesan = 'ERROR: Payment cannot be processed. Current transaction status is ' + @status + '.';

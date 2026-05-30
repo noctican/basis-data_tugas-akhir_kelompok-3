@@ -45,7 +45,6 @@ public class OrderAndShippingPanel extends JPanel {
         topPanel.add(filterPanel, BorderLayout.SOUTH);
         add(topPanel, BorderLayout.NORTH);
 
-        // REVISI: Menambahkan kolom "Status Pengiriman" agar admin tahu kondisi riil pesanan
         orderModelT = new DefaultTableModel(new String[]{"ID Transaksi", "Tanggal", "Total", "Status Pembayaran", "Metode", "Status Pengiriman"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -90,7 +89,7 @@ public class OrderAndShippingPanel extends JPanel {
 
     private void refreshOrders() {
         orderModelT.setRowCount(0);
-        List<Transaksi> list = orderModel.getAllOrders(); // Mengambil data yang sudah di-join
+        List<Transaksi> list = orderModel.getAllOrders(); 
         
         if (!"All".equals(currentFilter)) {
             list = list.stream()
@@ -99,7 +98,6 @@ public class OrderAndShippingPanel extends JPanel {
         }
         
         for (Transaksi t : list) {
-            // REVISI LOGIKA: Jika entitas pengiriman null, tampilkan "-" (artinya belum diproses kirim)
             String statusKirim = "-";
             if (t.getPengiriman() != null && t.getPengiriman().getStatusPengiriman() != null) {
                 statusKirim = t.getPengiriman().getStatusPengiriman();
@@ -111,7 +109,7 @@ public class OrderAndShippingPanel extends JPanel {
                 t.getTotalPembelian(),
                 t.getStatusPembayaran(), 
                 t.getMetodePembayaran(),
-                statusKirim // Masuk ke kolom Status Pengiriman
+                statusKirim 
             });
         }
     }
@@ -124,7 +122,6 @@ public class OrderAndShippingPanel extends JPanel {
             return;
         }
 
-        // VALIDASI: Cek status pengiriman saat ini yang ada di kolom index ke-5
         String currentShipStatus = (String) orderModelT.getValueAt(selectedRow, 5);
         if ("Delivered".equals(currentShipStatus) || "Canceled".equals(currentShipStatus)) {
             JOptionPane.showMessageDialog(this, "This order has already been " + currentShipStatus + "!", "Warning", JOptionPane.WARNING_MESSAGE);

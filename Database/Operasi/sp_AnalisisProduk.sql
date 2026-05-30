@@ -1,4 +1,4 @@
--- SP 1: Ambil Top 3 Produk yang Sering Dibeli Bersama dengan Produk Target
+-- Ambil Top 3 Produk yang Sering Dibeli Bersama dengan Produk Target
 
 CREATE PROCEDURE sp_Ambil_Top3_Produk_Dibeli_Bersama
     @id_produk_target INT
@@ -31,7 +31,7 @@ BEGIN
 END;
 GO
 
--- SP 2: Ambil Top 3 Produk yang Paling Sering Dibeli Bersamaan (Tanpa Produk Target)
+-- Ambil Top 3 Produk yang Paling Sering Dibeli Bersamaan (Tanpa Produk Target)
 
 CREATE PROCEDURE sp_Ambil_Top3_Produk_Paling_Sering_Dibeli_Bersamaan
 AS

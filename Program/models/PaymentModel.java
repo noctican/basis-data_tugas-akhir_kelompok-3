@@ -8,9 +8,6 @@ import java.math.BigDecimal;
 
 public class PaymentModel {
 
-    // ----------------------------------------------------------------
-    // Struktur hasil agar UI bisa cek sukses/gagal + pesan
-    // ----------------------------------------------------------------
     public static class HasilPembayaran {
         public final boolean sukses;
         public final String pesan;
@@ -21,9 +18,6 @@ public class PaymentModel {
         }
     }
 
-    // ----------------------------------------------------------------
-    // 1. Bayar transaksi (wallet)
-    // ----------------------------------------------------------------
     public HasilPembayaran bayarTransaksi(int idPengguna, int idTransaksi) {
         String sql = "{CALL sp_BayarTransaksi(?, ?, ?)}";
 
@@ -46,9 +40,6 @@ public class PaymentModel {
         }
     }
 
-    // ----------------------------------------------------------------
-    // 2. Batalkan / gagalkan pembayaran secara manual
-    // ----------------------------------------------------------------
     public HasilPembayaran gagalkanPembayaran(int idTransaksi) {
         String sql = "{CALL sp_GagalkanPembayaran(?, ?)}";
 
@@ -70,10 +61,6 @@ public class PaymentModel {
         }
     }
 
-    // ----------------------------------------------------------------
-    // 3. Cek & expire semua transaksi PENDING > 10 menit
-    //    Dipanggil saat panel dibuka atau dari timer
-    // ----------------------------------------------------------------
     public int cekExpiredPembayaran() {
         String sql = "{CALL sp_CekExpiredPembayaran(?)}";
 
@@ -90,9 +77,6 @@ public class PaymentModel {
         }
     }
 
-    // ----------------------------------------------------------------
-    // Helper: ambil info transaksi (id, status, total, tanggal, sisa waktu)
-    // ----------------------------------------------------------------
     public Object[] getInfoTransaksi(int idTransaksi, int idPengguna) {
         String sql =
             "SELECT t.id_transaksi, t.status_pembayaran, t.total_pembelian, " +
@@ -129,9 +113,6 @@ public class PaymentModel {
         return null;
     }
 
-    // ----------------------------------------------------------------
-    // Helper: ambil semua transaksi milik pelanggan
-    // ----------------------------------------------------------------
     public java.util.List<Object[]> getTransaksiPelanggan(int idPengguna) {
         java.util.List<Object[]> list = new java.util.ArrayList<>();
         String sql =

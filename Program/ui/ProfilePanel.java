@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 public class ProfilePanel extends JPanel {
     private UserModel userModel;
     
-    // Identity fields
     private JTextField txtNamaDepan;
     private JTextField txtNamaBelakang;
     private JTextField txtEmail; 
@@ -29,7 +28,6 @@ public class ProfilePanel extends JPanel {
     private JButton btnHapusAkun; 
     private boolean isEditMode = false;
 
-    // Customer Specific fields
     private JTable alamatTable, topupTable;
     private DefaultTableModel alamatModel, topupModel;
 
@@ -57,28 +55,24 @@ public class ProfilePanel extends JPanel {
         gbc.insets = new Insets(6, 8, 6, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // 1. Nama Depan
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.0;
         identityPanel.add(new JLabel("First Name:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtNamaDepan = new JTextField(20);
         identityPanel.add(txtNamaDepan, gbc);
 
-        // 2. Nama Belakang
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.0;
         identityPanel.add(new JLabel("Last Name:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtNamaBelakang = new JTextField(20);
         identityPanel.add(txtNamaBelakang, gbc);
 
-        // 3. Email
         gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0.0;
         identityPanel.add(new JLabel("Email:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
         txtEmail = new JTextField(20);
         identityPanel.add(txtEmail, gbc);
 
-        // 4. Password
         gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0.0;
         identityPanel.add(new JLabel("Password:"), gbc);
         gbc.gridx = 1; gbc.weightx = 1.0;
@@ -89,7 +83,6 @@ public class ProfilePanel extends JPanel {
         int currentY = 4;
 
         if (UserSession.getRole() == UserSession.Role.PELANGGAN) {
-            // 5. Jenis Member (Read-Only)
             gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
             identityPanel.add(new JLabel("Membership Type:"), gbc);
             gbc.gridx = 1; gbc.weightx = 1.0;
@@ -108,7 +101,6 @@ public class ProfilePanel extends JPanel {
             identityPanel.add(txtWallet, gbc);
             currentY++;
 
-            // 6. Poin (Read-Only)
             gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
             identityPanel.add(new JLabel("Points:"), gbc);
             gbc.gridx = 1; gbc.weightx = 1.0;
@@ -118,7 +110,6 @@ public class ProfilePanel extends JPanel {
             identityPanel.add(txtPoin, gbc);
             currentY++;
 
-            // 7. Tanggal Bergabung (Read-Only)
             gbc.gridx = 0; gbc.gridy = currentY; gbc.weightx = 0.0;
             identityPanel.add(new JLabel("Join Date:"), gbc);
             gbc.gridx = 1; gbc.weightx = 1.0;
@@ -129,7 +120,6 @@ public class ProfilePanel extends JPanel {
             currentY++;
         }
 
-        // Panel Khusus Tombol
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         
         btnHapusAkun = new JButton("Delete Account");
@@ -211,7 +201,6 @@ public class ProfilePanel extends JPanel {
                 currentUser.setEmail(emailBaru);
                 currentUser.setPassword(passwordBaru);
 
-                // boolean success = userModel.updatePenggunaFull(currentUser);
                 boolean success = true;
 
                 if (success) {
@@ -274,7 +263,6 @@ public class ProfilePanel extends JPanel {
     private void setupCustomerSpecifics() {
         JPanel centerPanel = new JPanel(new GridLayout(2, 1, 0, 20));
         
-        // Addresses
         JPanel aPanel = new JPanel(new BorderLayout());
         aPanel.setBorder(BorderFactory.createTitledBorder("My Addresses"));
         alamatModel = new DefaultTableModel(new String[]{"ID", "Recipient", "Street", "City", "Province", "Phone"}, 0) {
@@ -309,7 +297,6 @@ public class ProfilePanel extends JPanel {
         addressBtnPanel.add(deleteAddressBtn);
         aPanel.add(addressBtnPanel, BorderLayout.SOUTH);
 
-        // Topups
         JPanel tPanel = new JPanel(new BorderLayout());
         tPanel.setBorder(BorderFactory.createTitledBorder("Top-up History"));
         topupModel = new DefaultTableModel(new String[]{"Date", "Nominal", "Status"}, 0) {

@@ -10,7 +10,6 @@ import java.util.List;
 
 public class ProductAnalysisModel {
 
-    // Memanggil procedure pertama (butuh parameter ID Produk Target)
     public List<Object[]> getTop3ProductsBoughtTogether(int productId) {
         List<Object[]> resultList = new ArrayList<>();
         String sql = "{call sp_Ambil_Top3_Produk_Dibeli_Bersama(?)}";
@@ -33,7 +32,6 @@ public class ProductAnalysisModel {
         return resultList;
     }
 
-    // Memanggil procedure kedua (tanpa parameter)
     public List<Object[]> getTop3GlobalTogether() {
         List<Object[]> resultList = new ArrayList<>();
         String sql = "{call sp_Ambil_Top3_Produk_Paling_Sering_Dibeli_Bersamaan}";
@@ -57,7 +55,7 @@ public class ProductAnalysisModel {
         List<String> recommendations = new ArrayList<>();
         String sql = "{call sp_Ambil_Top3_Produk_Dibeli_Bersama(?)}";
 
-        try (Connection conn = config.DatabaseConfig.getConnection(); // Sesuaikan dengan config kamu
+        try (Connection conn = config.DatabaseConfig.getConnection();
             java.sql.CallableStatement stmt = conn.prepareCall(sql)) {
             
             stmt.setInt(1, productId);

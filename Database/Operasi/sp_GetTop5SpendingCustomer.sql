@@ -1,5 +1,5 @@
-CREATE PROCEDURE sp_get_top_5_spending_customers
-    @tanggal_mulai DATE = NULL  -- Parameter untuk memfilter kurun waktu terakhir
+CREATE PROCEDURE sp_GetTop5SpendingCustomer
+    @tanggal_mulai DATE = NULL  
 AS
 BEGIN
     SET NOCOUNT ON;

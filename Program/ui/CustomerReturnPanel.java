@@ -32,10 +32,8 @@ public class CustomerReturnPanel extends JPanel {
 
         add(GUIHelper.createContentHeader("My Returns & Help"), BorderLayout.NORTH);
 
-        // --- TOP PANEL (Eligible Items & Form) ---
         JPanel topSplit = new JPanel(new BorderLayout(10, 10));
 
-        // Eligible Items Table
         eligibleTableModel = new DefaultTableModel(
                 new String[]{"Trx ID", "Product Name", "Product ID", "SKU", "Qty Purchased", "Eligible Qty"}, 0) {
             @Override
@@ -57,7 +55,6 @@ public class CustomerReturnPanel extends JPanel {
         
         topSplit.add(eligiblePanel, BorderLayout.CENTER);
 
-        // Form Request (Right Side)
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createTitledBorder("Request Details"));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -81,7 +78,6 @@ public class CustomerReturnPanel extends JPanel {
 
         topSplit.add(formPanel, BorderLayout.EAST);
 
-        // --- BOTTOM PANEL (Return History) ---
         returnsTableModel = new DefaultTableModel(
                 new String[]{"Return ID", "Trx ID", "Date", "Status", "Product ID", "SKU", "Qty", "Reason"}, 0) {
             @Override
@@ -94,7 +90,6 @@ public class CustomerReturnPanel extends JPanel {
         tablePanel.setBorder(BorderFactory.createTitledBorder("My Return History"));
         tablePanel.add(new JScrollPane(returnsTable), BorderLayout.CENTER);
 
-        // Splitting top and bottom
         JSplitPane mainSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topSplit, tablePanel);
         mainSplit.setResizeWeight(0.5);
         mainSplit.setDividerLocation(300);
@@ -147,13 +142,11 @@ public class CustomerReturnPanel extends JPanel {
         if (UserSession.isLoggedIn()) {
             int idPengguna = UserSession.getCurrentUser().getIdPengguna();
             
-            // Load Eligible Items
             List<Object[]> eligibleItems = transactionModel.getEligibleReturnItems(idPengguna);
             for (Object[] row : eligibleItems) {
                 eligibleTableModel.addRow(row);
             }
             
-            // Load Return History
             List<Object[]> returns = returnModel.getReturnsByCustomer(idPengguna);
             for (Object[] row : returns) {
                 returnsTableModel.addRow(row);

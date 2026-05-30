@@ -55,7 +55,7 @@ public class OrderModel {
                     Transaksi t = new Transaksi();
                     t.setIdTransaksi(rs.getInt("id_transaksi"));
                     t.setTanggalTransaksi(rs.getTimestamp("tanggal_transaksi"));
-                    t.setTotalPembelian(rs.getBigDecimal("total_pembelian")); // Menggunakan BigDecimal sesuai ResultSet
+                    t.setTotalPembelian(rs.getBigDecimal("total_pembelian")); 
                     t.setStatusPembayaran(rs.getString("status_pembayaran"));
                     t.setMetodePembayaran(rs.getString("metode_pembayaran"));
                     
@@ -102,7 +102,7 @@ public class OrderModel {
 
             if (exists) {
                 try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
-                    psUpdate.setString(1, statusPengiriman); // 'Delivered' atau 'Canceled'
+                    psUpdate.setString(1, statusPengiriman);
                     psUpdate.setString(2, noResi);
                     psUpdate.setInt(3, idTransaksi);
                     return psUpdate.executeUpdate() > 0;

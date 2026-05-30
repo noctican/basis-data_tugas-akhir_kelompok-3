@@ -9,7 +9,6 @@ import java.util.List;
 public class ReturnModel {
     public List<Object[]> getReturnsByStatus(String status) {
         List<Object[]> list = new ArrayList<>();
-        // Query SQL menggunakan placeholder '?' untuk menyaring berdasarkan status dari dropdown UI
         String query = "SELECT r.id_retur, r.id_transaksi, dr.id_produk, dr.sku, dr.kuantitas, dr.alasan " +
                     "FROM retur r " +
                     "JOIN detail_retur dr ON r.id_retur = dr.id_retur " +
@@ -121,14 +120,12 @@ public class ReturnModel {
             conn = DatabaseConfig.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Hapus detail_retur (Anak tabel)
             String sqlDetail = "DELETE FROM detail_retur WHERE id_retur = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlDetail)) {
                 pstmt.setInt(1, idRetur);
                 pstmt.executeUpdate();
             }
 
-            // 2. Hapus data utama di tabel retur (Induk tabel)
             String sqlMain = "DELETE FROM retur WHERE id_retur = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlMain)) {
                 pstmt.setInt(1, idRetur);

@@ -1,4 +1,3 @@
--- DDL
 USE master;
 GO
 
@@ -11,7 +10,6 @@ GO
 USE db_eiger;
 GO
 
--- CREATE TABLE KATEGORI & PRODUK
 CREATE TABLE kategori (
 	id_kategori INT IDENTITY(1, 1) PRIMARY KEY,
 	nama_kategori VARCHAR(255) NOT NULL UNIQUE,
@@ -52,7 +50,6 @@ CREATE TABLE varian_produk (
 );
 GO
 
--- CREATE TABLE PENGGUNA, KARYAWAN, PELANGGAN
 CREATE TABLE pengguna (
 	id_pengguna INT IDENTITY(1, 1) PRIMARY KEY,
 	email VARCHAR(255) UNIQUE NOT NULL,
@@ -128,7 +125,6 @@ CREATE TABLE alamat_pelanggan (
 );
 GO
 
--- CREATE TABLE KERANJANG
 CREATE TABLE keranjang (
 	id_keranjang INT IDENTITY(1, 1) PRIMARY KEY,
 	id_pengguna INT UNIQUE,
@@ -148,7 +144,6 @@ CREATE TABLE detail_keranjang (
 );
 GO
 
--- CREATE TABLE TRANSAKSI
 CREATE TABLE transaksi (
 	id_transaksi INT IDENTITY(1, 1) PRIMARY KEY,
 	tanggal_transaksi DATETIME DEFAULT(GETDATE()),
@@ -179,7 +174,6 @@ CREATE TABLE detail_transaksi (
 );
 GO
 
--- CREATE TABLE RETUR
 CREATE TABLE retur (
 	id_retur INT IDENTITY(1, 1),
 	id_transaksi INT,

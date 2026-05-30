@@ -279,7 +279,7 @@ INSERT INTO alamat_pelanggan (id_pengguna, provinsi, kota, jalan, nama_penerima,
 (30, 'DIY Yogyakarta',    'Yogyakarta', 'Jl. Nusantara No. 41',    'Hana Kusumawati',   '143345609870');
 GO
 
--- 11. KERANJANG (1 keranjang per pelanggan)
+-- KERANJANG (1 keranjang per pelanggan)
 INSERT INTO keranjang (id_pengguna) VALUES
 (9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25),(26),(27),(28),(29),(30);
 GO

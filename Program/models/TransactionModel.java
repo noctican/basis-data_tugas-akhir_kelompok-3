@@ -218,7 +218,7 @@ public class TransactionModel {
             
             cstmt.setInt(1, idPengguna);
             cstmt.setString(2, metodePembayaran);
-            cstmt.registerOutParameter(3, Types.INTEGER); // @id_transaksi_baru OUTPUT
+            cstmt.registerOutParameter(3, Types.INTEGER); 
             
             cstmt.execute();
             return cstmt.getInt(3);
@@ -235,7 +235,7 @@ public class TransactionModel {
             
             cstmt.setInt(1, idPengguna);
             cstmt.setInt(2, idTransaksi);
-            cstmt.registerOutParameter(3, Types.NVARCHAR); // @hasil_pesan OUTPUT
+            cstmt.registerOutParameter(3, Types.NVARCHAR); 
             
             cstmt.execute();
             return cstmt.getString(3);
@@ -249,7 +249,7 @@ public class TransactionModel {
         try (Connection conn = DatabaseConfig.getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
-            cstmt.registerOutParameter(1, Types.INTEGER); // @jumlah_expired OUTPUT
+            cstmt.registerOutParameter(1, Types.INTEGER); 
             cstmt.execute();
             return cstmt.getInt(1);
         } catch (SQLException e) {
@@ -264,7 +264,7 @@ public class TransactionModel {
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
             cstmt.setInt(1, idTransaksi);
-            cstmt.registerOutParameter(2, Types.NVARCHAR); // @hasil_pesan OUTPUT
+            cstmt.registerOutParameter(2, Types.NVARCHAR); 
             
             cstmt.execute();
             return cstmt.getString(2);

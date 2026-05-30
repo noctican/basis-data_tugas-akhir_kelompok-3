@@ -1,6 +1,8 @@
 USE db_eiger;
 GO
 
+-- jalankan file ini untuk menambahkan semua operasi (view + stored procedure) ke dalam database setelah menjalankan file DDL dan DML
+
 CREATE VIEW v_Top5BarangPelanggan AS
 WITH UrutanPembelian AS (
     SELECT 
@@ -39,8 +41,6 @@ WHERE
     Ranking <= 5;
 GO
 
--- SP 1: Ambil Top 3 Produk yang Sering Dibeli Bersama dengan Produk Target
-
 CREATE PROCEDURE sp_Ambil_Top3_Produk_Dibeli_Bersama
     @id_produk_target INT
 AS
@@ -72,8 +72,6 @@ BEGIN
 END;
 GO
 
--- SP 2: Ambil Top 3 Produk yang Paling Sering Dibeli Bersamaan (Tanpa Produk Target)
-
 CREATE PROCEDURE sp_Ambil_Top3_Produk_Paling_Sering_Dibeli_Bersamaan
 AS
 BEGIN
@@ -99,9 +97,6 @@ BEGIN
         RAISERROR(@ErrorMessage, 16, 1);
     END CATCH
 END;
-GO
-
-USE db_eiger;
 GO
 
 CREATE OR ALTER PROCEDURE sp_BayarTransaksi
@@ -133,7 +128,6 @@ BEGIN
         RETURN;
     END
 
-    -- 2. Harus PENDING
     IF @status <> 'PENDING'
     BEGIN
         SET @hasil_pesan = 'ERROR: Payment cannot be processed. Current transaction status is ' + @status + '.';
@@ -562,8 +556,7 @@ BEGIN
     DECLARE @status_transaksi VARCHAR(100);
     DECLARE @qty_beli INT;
     DECLARE @qty_sudah_retur INT;
-
-=    SELECT @status_transaksi = t.status_pembayaran
+    SELECT @status_transaksi = t.status_pembayaran
     FROM transaksi t
     JOIN pelanggan_transaksi pt ON t.id_transaksi = pt.id_transaksi
     WHERE t.id_transaksi = @id_transaksi AND pt.id_pengguna = @id_pengguna;
@@ -580,7 +573,7 @@ BEGIN
         RETURN;
     END
 
-=    SELECT @qty_beli = kuantitas
+    SELECT @qty_beli = kuantitas
     FROM detail_transaksi
     WHERE id_transaksi = @id_transaksi AND id_produk = @id_produk AND sku = @sku;
 
@@ -596,7 +589,7 @@ BEGIN
         RETURN;
     END
 
-=    SELECT @qty_sudah_retur = ISNULL(SUM(dr.kuantitas), 0)
+    SELECT @qty_sudah_retur = ISNULL(SUM(dr.kuantitas), 0)
     FROM detail_retur dr
     JOIN retur r ON dr.id_retur = r.id_retur
     WHERE dr.id_transaksi = @id_transaksi AND dr.id_produk = @id_produk AND dr.sku = @sku AND r.status <> 'Failed';
@@ -610,7 +603,7 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-=        INSERT INTO retur (id_transaksi, status)
+        INSERT INTO retur (id_transaksi, status)
         VALUES (@id_transaksi, 'Pending');
         
         SET @id_retur = SCOPE_IDENTITY();
