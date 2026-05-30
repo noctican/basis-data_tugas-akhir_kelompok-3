@@ -11,7 +11,6 @@ BEGIN
     JOIN pelanggan_transaksi pt ON pg.id_pengguna = pt.id_pengguna
     JOIN transaksi t ON pt.id_transaksi = t.id_transaksi
     WHERE 
-        -- Jika parameter diisi, filter transaksi yang >= tanggal tersebut
         (@tanggal_mulai IS NULL OR t.tanggal_transaksi >= @tanggal_mulai)
     GROUP BY pg.nama_depan, pg.nama_belakang
     ORDER BY total_spend DESC;
