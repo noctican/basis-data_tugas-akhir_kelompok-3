@@ -1,0 +1,18 @@
+CREATE PROCEDURE sp_GetTop5SpendingCustomer
+    @tanggal_mulai DATE = NULL  
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT TOP 5 
+        pg.nama_depan + ' ' + ISNULL(pg.nama_belakang, '') AS full_name, 
+        SUM(t.total_pembelian) AS total_spend
+    FROM pengguna pg
+    JOIN pelanggan_transaksi pt ON pg.id_pengguna = pt.id_pengguna
+    JOIN transaksi t ON pt.id_transaksi = t.id_transaksi
+    WHERE 
+        (@tanggal_mulai IS NULL OR t.tanggal_transaksi >= @tanggal_mulai)
+    GROUP BY pg.nama_depan, pg.nama_belakang
+    ORDER BY total_spend DESC;
+END;
+GO

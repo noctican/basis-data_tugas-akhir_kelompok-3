@@ -4,9 +4,7 @@ GO
 USE db_eiger;
 GO
 
--- ================================================================
 -- DELETE ALL DATA
--- ================================================================
 
 ALTER TABLE departemen NOCHECK CONSTRAINT fk_manajer_departemen;
 GO
@@ -62,16 +60,14 @@ GO
 ALTER TABLE departemen CHECK CONSTRAINT fk_manajer_departemen;
 GO
 
--- ================================================================
 -- INSERT DATA
--- ================================================================
 
--- 1. KATEGORI
+-- KATEGORI
 INSERT INTO kategori (nama_kategori) VALUES
 ('Sepatu'), ('Pakaian'), ('Tas'), ('Topi'), ('Aksesoris');
 GO
 
--- 2. SUB_KATEGORI
+-- SUB_KATEGORI
 INSERT INTO sub_kategori (id_kategori, nama_sub_kategori) VALUES
 (1, 'Boots'), (1, 'Sandal'), (1, 'Sneakers'), (1, 'Trail Shoes'),
 (2, 'Kaos'), (2, 'Celana Panjang'), (2, 'Jaket'), (2, 'Hoodie'), (2, 'Celana Pendek'),
@@ -80,41 +76,41 @@ INSERT INTO sub_kategori (id_kategori, nama_sub_kategori) VALUES
 (5, 'Jam Tangan'), (5, 'Sarung Tangan'), (5, 'Kacamata'), (5, 'Kaos Kaki');
 GO
 
--- 3. PRODUK
+-- PRODUK
 INSERT INTO produk (id_kategori, id_sub_kategori, nama_produk, deskripsi_produk, harga_base, demografi, aktivitas) VALUES
-(1, 1, 'EIGER Apex Boots',          'Sepatu boots anti-air untuk medan berbatu',        850000, 'pria',      'Hiking'),
-(1, 1, 'EIGER Trail Boots Women',   'Boots ringan untuk wanita petualang',              780000, 'wanita',    'Hiking'),
-(1, 2, 'EIGER River Sandal',        'Sandal outdoor tahan air dan anti-selip',          320000, 'anak',      'Outdoor'),
-(1, 2, 'EIGER Trek Sandal',         'Sandal trekking dengan sol karet tebal',           280000, 'pria',      'Trekking'),
-(1, 3, 'EIGER Urban Sneakers',      'Sneakers kasual untuk aktivitas sehari-hari',      550000, 'pria',      'Casual'),
-(1, 3, 'EIGER Flow Sneakers',       'Sneakers ringan untuk wanita aktif',               490000, 'wanita',    'Casual'),
-(1, 4, 'EIGER Trail Runner',        'Sepatu lari trail berteknologi grip tinggi',       920000, 'pria',      'Trail Running'),
-(1, 4, 'EIGER Speed Trail',         'Sepatu trail lari cepat dengan cushioning',        870000, 'wanita',    'Trail Running'),
-(2, 5, 'EIGER Base Tee',            'Kaos dasar berbahan polyester anti-bau',           199000, 'pria',      'Casual'),
-(2, 5, 'EIGER Summit Tee Women',    'Kaos wanita breathable untuk pendakian',           189000, 'wanita',    'Hiking'),
-(2, 6, 'EIGER Cargo Pants',         'Celana panjang multi-pocket untuk outdoor',        450000, 'pria',      'Outdoor'),
-(2, 6, 'EIGER Tactical Pants',      'Celana taktis dengan bahan ripstop',               520000, 'pria',      'Tactical'),
-(2, 7, 'EIGER Windbreaker Jacket',  'Jaket anti-angin tipis dan ringan',                680000, 'pria',      'Hiking'),
-(2, 7, 'EIGER Rain Shield Jacket',  'Jaket hujan waterproof untuk pendakian',           750000, 'wanita',    'Camping'),
-(2, 8, 'EIGER Fleece Hoodie',       'Hoodie fleece hangat untuk camping',               395000, 'anak',      'Camping'),
-(2, 9, 'EIGER Quick Dry Shorts',    'Celana pendek quick-dry untuk olahraga',           250000, 'pria',      'Running'),
-(3,10, 'EIGER Daypack 20L',         'Tas ransel harian kapasitas 20 liter',             480000, 'anak',      'Field Trip'),
-(3,10, 'EIGER Summit Pack 45L',     'Tas gunung kapasitas 45 liter',                   1200000, 'pria',      'Hiking'),
-(3,10, 'EIGER Stone Pack 30L',      'Backpack serbaguna kapasitas 30 liter',            750000, 'pria',      'Outdoor'),
-(3,11, 'EIGER Crossbody Bag',       'Tas selempang kecil untuk aktivitas harian',       320000, 'wanita',    'Casual'),
-(3,12, 'EIGER Hip Pack',            'Waist bag untuk menyimpan barang penting',         220000, 'anak',      'Outdoor'),
-(3,13, 'EIGER Duffel 40L',          'Tas duffel besar untuk perjalanan',                580000, 'wanita',    'Traveling'),
-(4,14, 'EIGER Wool Beanie',         'Kupluk wol tebal untuk cuaca dingin',              120000, 'anak',      'Camping'),
-(4,15, 'EIGER Summit Cap',          'Topi baseball dengan panel ventilasi',             150000, 'pria',      'Hiking'),
-(4,16, 'EIGER Boonie Hat',          'Topi bucket lebar untuk perlindungan matahari',    175000, 'anak',      'Outdoor'),
-(5,17, 'EIGER Expedition Watch',    'Jam tangan digital dengan altimeter dan kompas',  1500000, 'equipment', 'Hiking'),
-(5,17, 'EIGER Sport Watch',         'Jam tangan sport tahan air 50m',                   950000, 'equipment', 'Running'),
-(5,18, 'EIGER Liner Gloves',        'Sarung tangan tipis anti-angin',                   185000, 'equipment', 'Camping'),
-(5,19, 'EIGER Polarized Sunglass',  'Kacamata polarisasi anti-UV untuk outdoor',        380000, 'equipment', 'Outdoor'),
-(5,20, 'EIGER Trekking Socks',      'Kaos kaki anti-lecet untuk trekking',               95000, 'equipment', 'Hiking');
+(1, 1, 'EIGER Apex Boots',          'Sepatu boots anti-air untuk medan berbatu',        850000, 'Pria',      'Hiking'),
+(1, 1, 'EIGER Trail Boots Women',   'Boots ringan untuk wanita petualang',              780000, 'Wanita',    'Hiking'),
+(1, 2, 'EIGER River Sandal',        'Sandal outdoor tahan air dan anti-selip',          320000, 'Anak',      'Outdoor'),
+(1, 2, 'EIGER Trek Sandal',         'Sandal trekking dengan sol karet tebal',           280000, 'Pria',      'Trekking'),
+(1, 3, 'EIGER Urban Sneakers',      'Sneakers kasual untuk aktivitas sehari-hari',      550000, 'Pria',      'Casual'),
+(1, 3, 'EIGER Flow Sneakers',       'Sneakers ringan untuk wanita aktif',               490000, 'Wanita',    'Casual'),
+(1, 4, 'EIGER Trail Runner',        'Sepatu lari trail berteknologi grip tinggi',       920000, 'Pria',      'Trail Running'),
+(1, 4, 'EIGER Speed Trail',         'Sepatu trail lari cepat dengan cushioning',        870000, 'Wanita',    'Trail Running'),
+(2, 5, 'EIGER Base Tee',            'Kaos dasar berbahan polyester anti-bau',           199000, 'Pria',      'Casual'),
+(2, 5, 'EIGER Summit Tee Women',    'Kaos wanita breathable untuk pendakian',           189000, 'Wanita',    'Hiking'),
+(2, 6, 'EIGER Cargo Pants',         'Celana panjang multi-pocket untuk outdoor',        450000, 'Pria',      'Outdoor'),
+(2, 6, 'EIGER Tactical Pants',      'Celana taktis dengan bahan ripstop',               520000, 'Pria',      'Tactical'),
+(2, 7, 'EIGER Windbreaker Jacket',  'Jaket anti-angin tipis dan ringan',                680000, 'Pria',      'Hiking'),
+(2, 7, 'EIGER Rain Shield Jacket',  'Jaket hujan waterproof untuk pendakian',           750000, 'Wanita',    'Camping'),
+(2, 8, 'EIGER Fleece Hoodie',       'Hoodie fleece hangat untuk camping',               395000, 'Anak',      'Camping'),
+(2, 9, 'EIGER Quick Dry Shorts',    'Celana pendek quick-dry untuk olahraga',           250000, 'Pria',      'Running'),
+(3,10, 'EIGER Daypack 20L',         'Tas ransel harian kapasitas 20 liter',             480000, 'Anak',      'Field Trip'),
+(3,10, 'EIGER Summit Pack 45L',     'Tas gunung kapasitas 45 liter',                   1200000, 'Pria',      'Hiking'),
+(3,10, 'EIGER Stone Pack 30L',      'Backpack serbaguna kapasitas 30 liter',            750000, 'Pria',      'Outdoor'),
+(3,11, 'EIGER Crossbody Bag',       'Tas selempang kecil untuk aktivitas harian',       320000, 'Wanita',    'Casual'),
+(3,12, 'EIGER Hip Pack',            'Waist bag untuk menyimpan barang penting',         220000, 'Anak',      'Outdoor'),
+(3,13, 'EIGER Duffel 40L',          'Tas duffel besar untuk perjalanan',                580000, 'Wanita',    'Traveling'),
+(4,14, 'EIGER Wool Beanie',         'Kupluk wol tebal untuk cuaca dingin',              120000, 'Anak',      'Camping'),
+(4,15, 'EIGER Summit Cap',          'Topi baseball dengan panel ventilasi',             150000, 'Pria',      'Hiking'),
+(4,16, 'EIGER Boonie Hat',          'Topi bucket lebar untuk perlindungan matahari',    175000, 'Anak',      'Outdoor'),
+(5,17, 'EIGER Expedition Watch',    'Jam tangan digital dengan altimeter dan kompas',  1500000, 'Equipment', 'Hiking'),
+(5,17, 'EIGER Sport Watch',         'Jam tangan sport tahan air 50m',                   950000, 'Equipment', 'Running'),
+(5,18, 'EIGER Liner Gloves',        'Sarung tangan tipis anti-angin',                   185000, 'Equipment', 'Camping'),
+(5,19, 'EIGER Polarized Sunglass',  'Kacamata polarisasi anti-UV untuk outdoor',        380000, 'Equipment', 'Outdoor'),
+(5,20, 'EIGER Trekking Socks',      'Kaos kaki anti-lecet untuk trekking',               95000, 'Equipment', 'Hiking');
 GO
 
--- 4. VARIAN_PRODUK
+-- VARIAN_PRODUK
 INSERT INTO varian_produk (id_produk, sku, stock, warna, harga_varian, ukuran) VALUES
 ( 1,'SKU001',41,'Hitam',   900000,'41'), ( 1,'SKU002',25,'Hitam',   800000,'40'), ( 1,'SKU003',46,'Hitam',   850000,'38'),
 ( 1,'SKU004',30,'Abu-abu', 900000,'41'), ( 1,'SKU005',34,'Abu-abu', 800000,'40'), ( 1,'SKU006',21,'Abu-abu', 800000,'38'),
@@ -164,7 +160,7 @@ INSERT INTO varian_produk (id_produk, sku, stock, warna, harga_varian, ukuran) V
 (30,'SKU132',19,'Abu-abu',  95000, NULL),      (30,'SKU133',22,'Putih',    95000, NULL);
 GO
 
--- 5. MEMBER
+-- MEMBER
 INSERT INTO member (jenis, poin, voucher_price, voucher_percentage) VALUES
 ('Blue',     2500,  25000.0000, 0.000),
 ('Silver',   5000,  50000.0000, 0.050),
@@ -172,7 +168,7 @@ INSERT INTO member (jenis, poin, voucher_price, voucher_percentage) VALUES
 ('Platinum',10000, 100000.0000, 0.150);
 GO
 
--- 6. PENGGUNA
+-- PENGGUNA
 INSERT INTO pengguna (email, nama_depan, nama_belakang, nomor_telepon, password) VALUES
 ('andi@email.com',  'Andi',   'Saputra',      '811111111',   'pass123'),
 ('budi@email.com',  'Budi',   'Santoso',       '822222222',   'pass153'),
@@ -206,7 +202,7 @@ INSERT INTO pengguna (email, nama_depan, nama_belakang, nomor_telepon, password)
 ('hana@email.com',  'Hana',   'Kusumawati',    '81345609870', 'pass658');
 GO
 
--- 7 & 8. DEPARTEMEN & KARYAWAN
+-- DEPARTEMEN & KARYAWAN
 ALTER TABLE departemen NOCHECK CONSTRAINT fk_manajer_departemen;
 GO
 
@@ -226,7 +222,7 @@ GO
 ALTER TABLE departemen CHECK CONSTRAINT fk_manajer_departemen;
 GO
 
--- 9. PELANGGAN
+-- PELANGGAN
 INSERT INTO pelanggan (id_pengguna, jenis_member, tanggal_bergabung, poin, is_used_voucher_percentage, is_used_voucher_price) VALUES
 ( 9, 'Blue',    '2025-02-26', 1859, 0, 0),
 (10, 'Silver',  '2025-03-13', 4914, 1, 1),
@@ -252,7 +248,7 @@ INSERT INTO pelanggan (id_pengguna, jenis_member, tanggal_bergabung, poin, is_us
 (30, 'Silver',  '2025-01-15', 3829, 1, 1);
 GO
 
--- 10. ALAMAT_PELANGGAN
+-- ALAMAT_PELANGGAN
 INSERT INTO alamat_pelanggan (id_pengguna, provinsi, kota, jalan, nama_penerima, no_telp) VALUES
 ( 9, 'Jawa Timur',        'Surabaya',   'Jl. Kamboja No. 19',      'Aulya Shabrina',   '143234567890'),
 (10, 'Jawa Timur',        'Surabaya',   'Jl. Kamboja No. 19',      'Dina Putri',        '144345678901'),
@@ -283,18 +279,20 @@ INSERT INTO alamat_pelanggan (id_pengguna, provinsi, kota, jalan, nama_penerima,
 (30, 'DIY Yogyakarta',    'Yogyakarta', 'Jl. Nusantara No. 41',    'Hana Kusumawati',   '143345609870');
 GO
 
--- 11. KERANJANG (1 keranjang per pelanggan)
+-- KERANJANG (1 keranjang per pelanggan)
 INSERT INTO keranjang (id_pengguna) VALUES
 (9),(10),(11),(12),(13),(14),(15),(16),(17),(18),(19),(20),(21),(22),(23),(24),(25),(26),(27),(28),(29),(30);
 GO
 
--- 12. DETAIL_KERANJANG
+-- DETAIL_KERANJANG
 INSERT INTO detail_keranjang (id_keranjang, id_produk, sku, kuantitas, sub_total) VALUES
-(1,  1,'SKU003',3, 2550000), (1,  5,'SKU029',1,  500000), (1,  4,'SKU020',2,  660000), (1,  7,'SKU039',3, 2610000),
+(1,  1,'SKU003',3, 2550000), (1,  5,'SKU029',1,  500000), 
+(1,  4,'SKU020',2,  660000), (1,  7,'SKU039',3, 2610000),
 (2, 21,'SKU111',1,  220000), (2,  6,'SKU033',2,  980000),
-(3,  2,'SKU011',3, 2190000), (3, 16,'SKU092',1,  250000), (3,  9,'SKU054',3,  597000),
-(4, 16,'SKU091',3,  750000),
-(5,  7,'SKU040',2, 1840000), (5, 11,'SKU061',1,  450000), (5,  7,'SKU042',1,  870000), (5,  8,'SKU046',3,  870000),
+(3,  2,'SKU011',3, 2190000), (3, 16,'SKU092',1,  250000), 
+(3,  9,'SKU054',3,  597000), (4, 16,'SKU091',3,  750000),
+(5,  7,'SKU040',2, 1840000), (5, 11,'SKU061',1,  450000), 
+(5,  7,'SKU042',1,  870000), (5,  8,'SKU046',3,  870000),
 (6, 20,'SKU106',1,  320000), (6, 11,'SKU064',3, 1350000), (6, 12,'SKU069',1,  520000),
 (7,  2,'SKU010',2, 1460000), (7, 25,'SKU121',2,  350000), (7, 10,'SKU057',2,  378000), (7,  9,'SKU052',1,  199000),
 (8,  2,'SKU007',2, 1560000), (8,  9,'SKU050',2,  398000),
@@ -314,51 +312,51 @@ INSERT INTO detail_keranjang (id_keranjang, id_produk, sku, kuantitas, sub_total
 (22, 2,'SKU012',1,  830000);
 GO
 
--- 13. TRANSAKSI
+-- TRANSAKSI
 INSERT INTO transaksi (tanggal_transaksi, total_pembelian, status_pembayaran, metode_pembayaran) VALUES
-('2025-01-16',  730000, 'Lunas',      'Kartu Kredit'),
-('2025-01-20', 1720000, 'Lunas',      'Kartu Kredit'),
-('2025-01-22', 2989000, 'Belum Lunas','Kartu Kredit'),
-('2025-01-26', 1740000, 'Lunas',      'E-Wallet'),
-('2025-01-28', 1560000, 'Lunas',      'COD'),
-('2025-02-01', 3807000, 'Lunas',      'E-Wallet'),
-('2025-02-04', 1460000, 'Lunas',      'Kartu Kredit'),
-('2025-02-06', 2045000, 'Lunas',      'E-Wallet'),
-('2025-02-10', 5200000, 'Belum Lunas','E-Wallet'),
-('2025-02-13', 6110000, 'Belum Lunas','Transfer Bank'),
-('2025-02-14', 2270000, 'Belum Lunas','Kartu Kredit'),
-('2025-02-18', 4305000, 'Belum Lunas','Kartu Kredit'),
-('2025-02-22', 3265000, 'Lunas',      'E-Wallet'),
-('2025-02-24', 1890000, 'Lunas',      'Kartu Kredit'),
-('2025-02-28', 2645000, 'Lunas',      'Kartu Kredit'),
-('2025-03-02', 4450000, 'Lunas',      'Transfer Bank'),
-('2025-03-06', 1260000, 'Lunas',      'Transfer Bank'),
-('2025-03-07',  398000, 'Lunas',      'COD'),
-('2025-03-12',  820000, 'Belum Lunas','E-Wallet'),
-('2025-03-13', 6060000, 'Lunas',      'E-Wallet'),
-('2025-03-17', 1578000, 'Belum Lunas','Kartu Kredit'),
-('2025-03-19', 2950000, 'Belum Lunas','Kartu Kredit'),
-('2025-03-23', 4440000, 'Belum Lunas','E-Wallet'),
-('2025-03-26', 2945000, 'Belum Lunas','COD'),
-('2025-03-29', 1500000, 'Lunas',      'COD'),
-('2025-04-02',  320000, 'Belum Lunas','Kartu Kredit'),
-('2025-04-03', 1010000, 'Belum Lunas','E-Wallet'),
-('2025-04-07', 3218000, 'Belum Lunas','Transfer Bank'),
-('2025-04-10',  500000, 'Belum Lunas','COD'),
-('2025-04-13',  850000, 'Lunas',      'Kartu Kredit'),
-('2025-04-16', 2270000, 'Lunas',      'E-Wallet'),
-('2025-04-20', 4617000, 'Lunas',      'COD'),
-('2025-04-22', 2408000, 'Lunas',      'Kartu Kredit'),
-('2025-04-25', 1490000, 'Lunas',      'E-Wallet'),
-('2025-04-27', 2180000, 'Lunas',      'Kartu Kredit'),
-('2025-05-01', 4765000, 'Lunas',      'Kartu Kredit'),
-('2025-05-04',  660000, 'Lunas',      'Kartu Kredit'),
-('2025-05-07', 3780000, 'Lunas',      'Transfer Bank'),
-('2025-05-10', 1560000, 'Lunas',      'COD'),
-('2025-05-14', 1640000, 'Lunas',      'E-Wallet');
+('2025-01-16',  730000, 'Paid', 'Wallet'),
+('2025-01-20', 1720000, 'Paid', 'Wallet'),
+('2025-01-22', 2989000, 'Failed', 'Wallet'),
+('2025-01-26', 1740000, 'Paid', 'Wallet'),
+('2025-01-28', 1560000, 'Paid', 'Wallet'),
+('2025-02-01', 3807000, 'Paid', 'Wallet'),
+('2025-02-04', 1460000, 'Paid', 'Wallet'),
+('2025-02-06', 2045000, 'Paid', 'Wallet'),
+('2025-02-10', 5200000, 'Failed','Wallet'),
+('2025-02-13', 6110000, 'Failed','Wallet'),
+('2025-02-14', 2270000, 'Failed','Wallet'),
+('2025-02-18', 4305000, 'Failed','Wallet'),
+('2025-02-22', 3265000, 'Paid', 'Wallet'),
+('2025-02-24', 1890000, 'Paid', 'Wallet'),
+('2025-02-28', 2645000, 'Paid', 'Wallet'),
+('2025-03-02', 4450000, 'Paid', 'Wallet'),
+('2025-03-06', 1260000, 'Paid', 'Wallet'),
+('2025-03-07',  398000, 'Paid', 'Wallet'),
+('2025-03-12',  820000, 'Failed','Wallet'),
+('2025-03-13', 6060000, 'Paid', 'Wallet'),
+('2025-03-17', 1578000, 'Failed','Wallet'),
+('2025-03-19', 2950000, 'Failed','Wallet'),
+('2025-03-23', 4440000, 'Failed','Wallet'),
+('2025-03-26', 2945000, 'Failed','Wallet'),
+('2025-03-29', 1500000, 'Paid', 'Wallet'),
+('2025-04-02',  320000, 'Failed','Wallet'),
+('2025-04-03', 1010000, 'Failed','Wallet'),
+('2025-04-07', 3218000, 'Failed','Wallet'),
+('2025-04-10',  500000, 'Failed','Wallet'),
+('2025-04-13',  850000, 'Paid', 'Wallet'),
+('2025-04-16', 2270000, 'Paid', 'Wallet'),
+('2025-04-20', 4617000, 'Paid', 'Wallet'),
+('2025-04-22', 2408000, 'Paid', 'Wallet'),
+('2025-04-25', 1490000, 'Paid', 'Wallet'),
+('2025-04-27', 2180000, 'Paid', 'Wallet'),
+('2025-05-01', 4765000, 'Paid', 'Wallet'),
+('2025-05-04',  660000, 'Paid', 'Wallet'),
+('2025-05-07', 3780000, 'Paid', 'Wallet'),
+('2025-05-10', 1560000, 'Paid', 'Wallet'),
+('2025-05-14', 1640000, 'Paid', 'Wallet');
 GO
 
--- 14. PELANGGAN_TRANSAKSI
+-- PELANGGAN_TRANSAKSI
 INSERT INTO pelanggan_transaksi (id_pengguna, id_transaksi) VALUES
 ( 9, 1),( 10, 2),( 11, 3),( 12, 4),( 13, 5),( 14, 6),( 15, 7),( 16, 8),( 17, 9),( 18,10),
 ( 19,11),( 20,12),( 21,13),( 22,14),( 23,15),( 24,16),( 25,17),( 26,18),( 27,19),( 28,20),
@@ -367,7 +365,7 @@ INSERT INTO pelanggan_transaksi (id_pengguna, id_transaksi) VALUES
 ( 19,33),( 20,34),( 21,35),( 22,36),( 23,37),( 24,38),( 25,39),( 26,40);
 GO
 
--- 15. DETAIL_TRANSAKSI
+-- DETAIL_TRANSAKSI
 INSERT INTO detail_transaksi (id_produk, sku, id_transaksi, harga_pembelian, kuantitas) VALUES
 ( 2,'SKU008', 1, 730000,1), ( 1,'SKU006', 2, 800000,1), ( 7,'SKU040', 2, 920000,1),
 ( 5,'SKU030', 3, 500000,2), (10,'SKU056', 3, 189000,1), (24,'SKU120', 3, 150000,3), (11,'SKU066', 3, 450000,3),
@@ -410,60 +408,60 @@ INSERT INTO detail_transaksi (id_produk, sku, id_transaksi, harga_pembelian, kua
 ( 8,'SKU045',40, 820000,2);
 GO
 
--- 16. PENGIRIMAN
+-- PENGIRIMAN
 INSERT INTO pengiriman (no_resi, id_transaksi, nama_ekspedisi, jalan, nama_penerima, kota, no_telp, kode_pos, provinsi, status_pengiriman, biaya_pengiriman, tanggal_pengiriman) VALUES
-('RESI001', 1,  'Pos Indonesia', 'Jl. Melati No. 12',        'Aulya Shabrina',   'Jakarta',   '143234567890', 10110, 'DKI Jakarta',       'Diproses', 28229,  '2025-01-17'),
-('RESI002', 2,  'J&T',           'Jl. Kamboja No. 19',       'Aulya Shabrina',   'Surabaya',  '143234567890', 60111, 'Jawa Timur',         'Diproses', 42225,  '2025-01-21'),
-('RESI003', 3,  'JNE',           'Jl. Kamboja No. 19',       'Dina Putri',        'Surabaya',  '144345678901', 60111, 'Jawa Timur',         'Dikirim',  36761,  '2025-01-23'),
-('RESI004', 4,  'SiCepat',       'Jl. Mawar No. 21',         'Nadine Clarissa',   'Bandung',   '146981259230', 40111, 'Jawa Barat',         'Selesai',  20539,  '2025-01-27'),
-('RESI005', 5,  'SiCepat',       'Jl. Anggrek No. 8',        'Fifi Hafifah',      'Yogyakarta','147634612260', 55111, 'DI Yogyakarta',      'Diproses', 28888,  '2025-01-29'),
-('RESI006', 6,  'Anteraja',      'Jl. Flamboyan No. 15',     'Ariq Anugrah',      'Semarang',  '143234312830', 50111, 'Jawa Tengah',        'Selesai',  39807,  '2025-02-02'),
-('RESI007', 7,  'JNE',           'Jl. Dahlia No. 3',         'Ariq Anugrah',      'Malang',    '143234312830', 65111, 'Jawa Timur',         'Dikirim',  31186,  '2025-02-05'),
-('RESI008', 8,  'JNE',           'Jl. Dahlia No. 3',         'Candra Andika',     'Malang',    '149523429310', 65111, 'Jawa Timur',         'Selesai',  40276,  '2025-02-07'),
-('RESI009', 9,  'Anteraja',      'Jl. Lely No. 45',          'Hilmi Isnaini',     'Batu',      '144194492310', 65311, 'Jawa Timur',         'Selesai',  43976,  '2025-02-11'),
-('RESI010', 10, 'SiCepat',       'Jl. Kenangan No. 10',      'Noval Zakky',       'Medan',     '143231241210', 20111, 'Sumatera Utara',     'Diproses', 38969,  '2025-02-14'),
-('RESI011', 11, 'JNE',           'Jl. Papua No. 12',         'Reza Firmansyah',   'Makassar',  '143298765430', 90111, 'Sulawesi Selatan',   'Dikirim',  18586,  '2025-02-15'),
-('RESI012', 12, 'SiCepat',       'Jl. Sigura No. 8',         'Reza Firmansyah',   'Jakarta',   '143298765430', 10110, 'DKI Jakarta',        'Diproses', 17957,  '2025-02-19'),
-('RESI013', 13, 'JNE',           'Jl. Sigura No. 8',         'Sinta Rahayu',      'Jakarta',   '147612345670', 10110, 'DKI Jakarta',        'Selesai',  20379,  '2025-02-23'),
-('RESI014', 14, 'SiCepat',       'Jl. Merdeka No. 5',        'Bagas Nugroho',     'Surabaya',  '149712345670', 60111, 'Jawa Timur',         'Selesai',  36738,  '2025-02-25'),
-('RESI015', 15, 'JNE',           'Jl. Diponegoro No. 17',    'Layla Fitriani',    'Bandung',   '143345678900', 40111, 'Jawa Barat',         'Selesai',  40241,  '2025-03-01'),
-('RESI016', 16, 'JNE',           'Jl. Sudirman No. 22',      'Dimas Kurniawan',   'Yogyakarta','144456789010', 55111, 'DI Yogyakarta',      'Selesai',  42661,  '2025-03-03'),
-('RESI017', 17, 'SiCepat',       'Jl. Gatot Subroto No. 9',  'Dimas Kurniawan',   'Semarang',  '144456789010', 50111, 'Jawa Tengah',        'Dikirim',  37229,  '2025-03-07'),
-('RESI018', 18, 'Anteraja',      'Jl. Gatot Subroto No. 9',  'Nadia Susanti',     'Semarang',  '145567890120', 50111, 'Jawa Tengah',        'Selesai',  39935,  '2025-03-08'),
-('RESI019', 19, 'Pos Indonesia',  'Jl. Ahmad Yani No. 33',   'Yoga Pratama',      'Malang',    '143678901230', 65111, 'Jawa Timur',         'Diproses', 22491,  '2025-03-13'),
-('RESI020', 20, 'Pos Indonesia',  'Jl. Pahlawan No. 7',      'Putri Wulandari',   'Batu',      '146789012340', 65311, 'Jawa Timur',         'Selesai',  14575,  '2025-03-14'),
-('RESI021', 21, 'SiCepat',       'Jl. Veteran No. 14',       'Adit Setiawan',     'Medan',     '147890123450', 20111, 'Sumatera Utara',     'Dikirim',  43275,  '2025-03-18'),
-('RESI022', 22, 'SiCepat',       'Jl. Pemuda No. 28',        'Adit Setiawan',     'Makassar',  '147890123450', 90111, 'Sulawesi Selatan',   'Dikirim',  29566,  '2025-03-20'),
-('RESI023', 23, 'Pos Indonesia',  'Jl. Melati No. 12',       'Aulya Shabrina',    'Jakarta',   '143234567890', 10110, 'DKI Jakarta',        'Diproses', 19738,  '2025-03-24'),
-('RESI024', 24, 'Anteraja',      'Jl. Kamboja No. 19',       'Aulya Shabrina',    'Surabaya',  '143234567890', 60111, 'Jawa Timur',         'Diproses', 32618,  '2025-03-27'),
-('RESI025', 25, 'SiCepat',       'Jl. Kamboja No. 19',       'Dina Putri',        'Surabaya',  '144345678901', 60111, 'Jawa Timur',         'Diproses', 39841,  '2025-03-30'),
-('RESI026', 26, 'SiCepat',       'Jl. Mawar No. 21',         'Nadine Clarissa',   'Bandung',   '146981259230', 40111, 'Jawa Barat',         'Selesai',  35098,  '2025-04-03'),
-('RESI027', 27, 'J&T',           'Jl. Anggrek No. 8',        'Fifi Hafifah',      'Yogyakarta','147634612260', 55111, 'DI Yogyakarta',      'Selesai',  30852,  '2025-04-04'),
-('RESI028', 28, 'Anteraja',      'Jl. Flamboyan No. 15',     'Ariq Anugrah',      'Semarang',  '143234312830', 50111, 'Jawa Tengah',        'Diproses', 35302,  '2025-04-08'),
-('RESI029', 29, 'J&T',           'Jl. Dahlia No. 3',         'Ariq Anugrah',      'Malang',    '143234312830', 65111, 'Jawa Timur',         'Selesai',  18273,  '2025-04-11'),
-('RESI030', 30, 'Pos Indonesia',  'Jl. Dahlia No. 3',        'Candra Andika',     'Malang',    '149523429310', 65111, 'Jawa Timur',         'Dikirim',  16577,  '2025-04-14'),
-('RESI031', 31, 'Anteraja',      'Jl. Lely No. 45',          'Hilmi Isnaini',     'Batu',      '144194492310', 65311, 'Jawa Timur',         'Diproses', 11005,  '2025-04-17'),
-('RESI032', 32, 'J&T',           'Jl. Kenangan No. 10',      'Noval Zakky',       'Medan',     '143231241210', 20111, 'Sumatera Utara',     'Selesai',  14903,  '2025-04-21'),
-('RESI033', 33, 'Anteraja',      'Jl. Papua No. 12',         'Reza Firmansyah',   'Makassar',  '143298765430', 90111, 'Sulawesi Selatan',   'Dikirim',  36049,  '2025-04-23');
+('RESI001', 1,  'Pos Indonesia', 'Jl. Melati No. 12',        'Aulya Shabrina',   'Jakarta',   '143234567890', 10110, 'DKI Jakarta',       'Process', 28229,  '2025-01-17'),
+('RESI002', 2,  'J&T',           'Jl. Kamboja No. 19',       'Aulya Shabrina',   'Surabaya',  '143234567890', 60111, 'Jawa Timur',         'Completed', 42225,  '2025-01-21'),
+('RESI003', 3,  'JNE',           'Jl. Kamboja No. 19',       'Dina Putri',        'Surabaya',  '144345678901', 60111, 'Jawa Timur',         'Process',  36761,  '2025-01-23'),
+('RESI004', 4,  'SiCepat',       'Jl. Mawar No. 21',         'Nadine Clarissa',   'Bandung',   '146981259230', 40111, 'Jawa Barat',         'Process',  20539,  '2025-01-27'),
+('RESI005', 5,  'SiCepat',       'Jl. Anggrek No. 8',        'Fifi Hafifah',      'Yogyakarta','147634612260', 55111, 'DI Yogyakarta',      'Process', 28888,  '2025-01-29'),
+('RESI006', 6,  'Anteraja',      'Jl. Flamboyan No. 15',     'Ariq Anugrah',      'Semarang',  '143234312830', 50111, 'Jawa Tengah',        'Process',  39807,  '2025-02-02'),
+('RESI007', 7,  'JNE',           'Jl. Dahlia No. 3',         'Ariq Anugrah',      'Malang',    '143234312830', 65111, 'Jawa Timur',         'Delivered',  31186,  '2025-02-05'),
+('RESI008', 8,  'JNE',           'Jl. Dahlia No. 3',         'Candra Andika',     'Malang',    '149523429310', 65111, 'Jawa Timur',         'Completed',  40276,  '2025-02-07'),
+('RESI009', 9,  'Anteraja',      'Jl. Lely No. 45',          'Hilmi Isnaini',     'Batu',      '144194492310', 65311, 'Jawa Timur',         'Completed',  43976,  '2025-02-11'),
+('RESI010', 10, 'SiCepat',       'Jl. Kenangan No. 10',      'Noval Zakky',       'Medan',     '143231241210', 20111, 'Sumatera Utara',     'Process', 38969,  '2025-02-14'),
+('RESI011', 11, 'JNE',           'Jl. Papua No. 12',         'Reza Firmansyah',   'Makassar',  '143298765430', 90111, 'Sulawesi Selatan',   'Delivered',  18586,  '2025-02-15'),
+('RESI012', 12, 'SiCepat',       'Jl. Sigura No. 8',         'Reza Firmansyah',   'Jakarta',   '143298765430', 10110, 'DKI Jakarta',        'Process', 17957,  '2025-02-19'),
+('RESI013', 13, 'JNE',           'Jl. Sigura No. 8',         'Sinta Rahayu',      'Jakarta',   '147612345670', 10110, 'DKI Jakarta',        'Completed',  20379,  '2025-02-23'),
+('RESI014', 14, 'SiCepat',       'Jl. Merdeka No. 5',        'Bagas Nugroho',     'Surabaya',  '149712345670', 60111, 'Jawa Timur',         'Completed',  36738,  '2025-02-25'),
+('RESI015', 15, 'JNE',           'Jl. Diponegoro No. 17',    'Layla Fitriani',    'Bandung',   '143345678900', 40111, 'Jawa Barat',         'Completed',  40241,  '2025-03-01'),
+('RESI016', 16, 'JNE',           'Jl. Sudirman No. 22',      'Dimas Kurniawan',   'Yogyakarta','144456789010', 55111, 'DI Yogyakarta',      'Completed',  42661,  '2025-03-03'),
+('RESI017', 17, 'SiCepat',       'Jl. Gatot Subroto No. 9',  'Dimas Kurniawan',   'Semarang',  '144456789010', 50111, 'Jawa Tengah',        'Delivered',  37229,  '2025-03-07'),
+('RESI018', 18, 'Anteraja',      'Jl. Gatot Subroto No. 9',  'Nadia Susanti',     'Semarang',  '145567890120', 50111, 'Jawa Tengah',        'Completed',  39935,  '2025-03-08'),
+('RESI019', 19, 'Pos Indonesia',  'Jl. Ahmad Yani No. 33',   'Yoga Pratama',      'Malang',    '143678901230', 65111, 'Jawa Timur',         'Process', 22491,  '2025-03-13'),
+('RESI020', 20, 'Pos Indonesia',  'Jl. Pahlawan No. 7',      'Putri Wulandari',   'Batu',      '146789012340', 65311, 'Jawa Timur',         'Completed',  14575,  '2025-03-14'),
+('RESI021', 21, 'SiCepat',       'Jl. Veteran No. 14',       'Adit Setiawan',     'Medan',     '147890123450', 20111, 'Sumatera Utara',     'Delivered',  43275,  '2025-03-18'),
+('RESI022', 22, 'SiCepat',       'Jl. Pemuda No. 28',        'Adit Setiawan',     'Makassar',  '147890123450', 90111, 'Sulawesi Selatan',   'Delivered',  29566,  '2025-03-20'),
+('RESI023', 23, 'Pos Indonesia',  'Jl. Melati No. 12',       'Aulya Shabrina',    'Jakarta',   '143234567890', 10110, 'DKI Jakarta',        'Process', 19738,  '2025-03-24'),
+('RESI024', 24, 'Anteraja',      'Jl. Kamboja No. 19',       'Aulya Shabrina',    'Surabaya',  '143234567890', 60111, 'Jawa Timur',         'Completed', 32618,  '2025-03-27'),
+('RESI025', 25, 'SiCepat',       'Jl. Kamboja No. 19',       'Dina Putri',        'Surabaya',  '144345678901', 60111, 'Jawa Timur',         'Process', 39841,  '2025-03-30'),
+('RESI026', 26, 'SiCepat',       'Jl. Mawar No. 21',         'Nadine Clarissa',   'Bandung',   '146981259230', 40111, 'Jawa Barat',         'Process', 35098,  '2025-04-03'),
+('RESI027', 27, 'J&T',           'Jl. Anggrek No. 8',        'Fifi Hafifah',      'Yogyakarta','147634612260', 55111, 'DI Yogyakarta',      'Delivered', 30852,  '2025-04-04'),
+('RESI028', 28, 'Anteraja',      'Jl. Flamboyan No. 15',     'Ariq Anugrah',      'Semarang',  '143234312830', 50111, 'Jawa Tengah',        'Process', 35302,  '2025-04-08'),
+('RESI029', 29, 'J&T',           'Jl. Dahlia No. 3',         'Ariq Anugrah',      'Malang',    '143234312830', 65111, 'Jawa Timur',         'Process', 18273,  '2025-04-11'),
+('RESI030', 30, 'Pos Indonesia',  'Jl. Dahlia No. 3',        'Candra Andika',     'Malang',    '149523429310', 65111, 'Jawa Timur',         'Delivered',  16577,  '2025-04-14'),
+('RESI031', 31, 'Anteraja',      'Jl. Lely No. 45',          'Hilmi Isnaini',     'Batu',      '144194492310', 65311, 'Jawa Timur',         'Completed', 11005,  '2025-04-17'),
+('RESI032', 32, 'J&T',           'Jl. Kenangan No. 10',      'Noval Zakky',       'Medan',     '143231241210', 20111, 'Sumatera Utara',     'Delivered',  14903,  '2025-04-21'),
+('RESI033', 33, 'Anteraja',      'Jl. Papua No. 12',         'Reza Firmansyah',   'Makassar',  '143298765430', 90111, 'Sulawesi Selatan',   'Process',  36049,  '2025-04-23');
 GO
 
--- 17. RETUR
+-- RETUR
 SET IDENTITY_INSERT retur ON;
 INSERT INTO retur (id_retur, id_transaksi, tanggal_pengembalian, status, id_validator) VALUES
-( 1, 16, '2025-01-25', 'ditolak',   7),
-( 2,  6, '2025-01-30', 'ditolak',   7),
-( 3, 10, '2025-02-04', 'selesai',   4),
-( 4, 17, '2025-02-09', 'selesai',   1),
-( 5,  5, '2025-02-14', 'disetujui', 8),
-( 6, 17, '2025-02-19', 'disetujui', 8),
-( 7,  7, '2025-02-24', 'selesai',   4),
-( 8, 19, '2025-03-01', 'selesai',   1),
-( 9, 39, '2025-03-06', 'disetujui', 8),
-(10, 15, '2025-03-11', 'ditolak',   4);
+( 1, 16, '2025-01-25', 'Pending',   7),
+( 2,  6, '2025-01-30', 'Pending',   7),
+( 3, 10, '2025-02-04', 'Pending',   4),
+( 4, 17, '2025-02-09', 'Pending',   1),
+( 5,  5, '2025-02-14', 'Pending', 8),
+( 6, 17, '2025-02-19', 'Pending', 8),
+( 7,  7, '2025-02-24', 'Pending',   4),
+( 8, 19, '2025-03-01', 'Pending',   1),
+( 9, 39, '2025-03-06', 'Pending', 8),
+(10, 15, '2025-03-11', 'Pending',   4);
 SET IDENTITY_INSERT retur OFF;
 GO
 
--- 18. DETAIL_RETUR
+-- DETAIL_RETUR
 INSERT INTO detail_retur (id_transaksi, id_retur, id_produk, sku, kuantitas, alasan) VALUES
 (16,  1, 11, 'SKU063', 1, 'Barang rusak'),
 ( 6,  2,  9, 'SKU051', 3, 'Salah kirim'),
@@ -476,3 +474,5 @@ INSERT INTO detail_retur (id_transaksi, id_retur, id_produk, sku, kuantitas, ala
 (39,  9, 12, 'SKU069', 2, 'Kualitas buruk'),
 (15, 10, 11, 'SKU062', 1, 'Warna berbeda');
 GO
+
+update retur set status = 'Pending'

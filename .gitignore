@@ -1,4 +1,3 @@
-.vscode/
 .marscode/
 .env
-.env/*
+*.class
